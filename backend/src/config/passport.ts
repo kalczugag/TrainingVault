@@ -5,7 +5,6 @@ import {
     StrategyOptionsWithoutRequest,
 } from "passport-jwt";
 import { UserModel } from "../models/User";
-import { RoleModel } from "../models/Role";
 
 const opts: StrategyOptionsWithoutRequest = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
