@@ -1,19 +1,20 @@
 import express from "express";
 import ms from "ms";
-import { errorResponse } from "../../../handlers/apiResponse";
-import { genPassword, issueJWT } from "../../../utils/helpers";
+import { errorResponse } from "../../handlers/apiResponse";
+import { genPassword, issueJWT } from "../../utils/helpers";
+import { UserModel } from "../../models/User";
 import schema from "./schemaValidate";
-import { UserModel } from "../../../models/User";
-import { RoleModel } from "../../../models/Role";
-import { User } from "../../../types/User";
 
-interface RegisterRequestBody extends User {
+interface RegisterRequestBody {
+    email: string;
     password: string;
+    role?: string;
+    coachId?: string;
 }
 
 export const register = async (
     req: express.Request<{}, {}, RegisterRequestBody>,
-    res: express.Response
+    res: express.Response,
 ) => {
     const { error } = schema.validate(req.body);
 
@@ -24,28 +25,20 @@ export const register = async (
                 errorResponse(
                     null,
                     error.details.map((detail) => detail.message).join(", "),
-                    400
-                )
+                    400,
+                ),
             );
     }
 
+    const { password } = req.body;
+
     try {
-        const { salt, hash } = genPassword(req.body.password);
-
-        let defaultRole = await RoleModel.findOne({ name: "client" }).exec();
-
-        if (!defaultRole) {
-            defaultRole = await RoleModel.create({
-                name: "client",
-                permissions: ["read"],
-            });
-        }
+        const { salt, hash } = genPassword(password);
 
         const newUser = new UserModel({
             ...req.body,
             hash,
             salt,
-            _role: defaultRole._id,
         });
 
         await newUser.save();
@@ -53,36 +46,38 @@ export const register = async (
         const accessToken = issueJWT(newUser, "access");
         const refreshToken = issueJWT(newUser, "refresh");
 
-        const refreshTokenMaxAge = ms(refreshToken.expires);
-
         newUser.refreshToken = refreshToken;
         await newUser.save();
 
         res.cookie("refreshToken", refreshToken.token, {
             httpOnly: true,
-            secure: false,
+            secure: process.env.NODE_ENV === "production",
             sameSite: "lax",
-            maxAge: refreshTokenMaxAge,
+            maxAge: refreshToken.expiresInMs,
         });
 
         return res.status(201).json({
             success: true,
-            isAdmin: false,
             userId: newUser._id,
-            cartId: newUser._cart,
+            role: newUser.role,
+            email: newUser.email,
             ...accessToken,
         });
-    } catch (err) {
-        if (err instanceof Error) {
-            console.error(err);
-            if (err.message.includes("duplicate key")) {
-                return res
-                    .status(409)
-                    .json(errorResponse(null, "User already exists", 409));
-            }
+    } catch (err: any) {
+        if (err.message?.includes("duplicate key")) {
+            return res
+                .status(409)
+                .json(
+                    errorResponse(
+                        null,
+                        "User with this email already exists",
+                        409,
+                    ),
+                );
         }
+        console.error(err);
         return res
             .status(500)
-            .json(errorResponse(null, "Internal server error"));
+            .json(errorResponse(null, "Internal server error", 500));
     }
 };

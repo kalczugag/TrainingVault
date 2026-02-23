@@ -1,7 +1,6 @@
 import express from "express";
-import { errorResponse } from "../../../handlers/apiResponse";
-import { UserModel } from "../../../models/User";
-import { redisClient } from "../../../config/redis";
+import { errorResponse } from "../../handlers/apiResponse";
+import { UserModel } from "../../models/User";
 
 export const logout = async (req: express.Request, res: express.Response) => {
     const cookies = req.cookies;
@@ -28,8 +27,6 @@ export const logout = async (req: express.Request, res: express.Response) => {
                 sameSite: "lax",
             });
 
-            await redisClient.del("current_user:no-query");
-
             return res
                 .status(401)
                 .json(errorResponse(null, "Invalid refresh token", 401));
@@ -37,7 +34,7 @@ export const logout = async (req: express.Request, res: express.Response) => {
 
         await UserModel.updateOne(
             { "refreshToken.token": refreshToken },
-            { $set: { refreshToken: null } }
+            { $set: { refreshToken: null } },
         );
 
         res.clearCookie("refreshToken", {
