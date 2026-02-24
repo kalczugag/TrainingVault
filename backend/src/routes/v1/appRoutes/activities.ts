@@ -11,6 +11,14 @@ const activities = (router: express.Router) => {
         }),
         methods.readAndSave,
     );
+
+    router.post(
+        "/activities/:dbActivityId/sync-stream",
+        passport.authenticate(["jwt"], {
+            session: false,
+        }),
+        methods.syncStream,
+    );
 };
 
 export default activities;

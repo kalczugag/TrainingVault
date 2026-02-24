@@ -2,6 +2,7 @@ import express from "express";
 import { GarminConnect } from "@flow-js/garmin-connect";
 import { errorResponse, successResponse } from "../../handlers/apiResponse";
 import { decrypt } from "../../utils/crypto";
+import { getGarminClient } from "../../config/garmin";
 import { UserModel } from "../../models/User";
 import { ActivityModel } from "../../models/Activity";
 import type { User } from "../../types/User";
@@ -33,17 +34,10 @@ export const fetchAndSaveActivities = async (
             return res.status(404).json(errorResponse(null, "User not found"));
         }
 
-        const plainPassword = decrypt(
-            user.garminCredentials.passwordEncrypted,
-            user.garminCredentials.iv,
+        const garminClient = await getGarminClient(
+            user._id,
+            user.garminCredentials,
         );
-
-        const garminClient = new GarminConnect({
-            username: user.garminCredentials.email,
-            password: plainPassword,
-        });
-
-        await garminClient.login();
 
         let start = 0;
         const limit = 50;
@@ -61,7 +55,6 @@ export const fetchAndSaveActivities = async (
         oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 
         while (keepFetching) {
-            console.log(`Pobieram paczkę od indeksu: ${start}...`);
             const activities = await garminClient.getActivities(start, limit);
 
             if (!activities || activities.length === 0) {
@@ -190,9 +183,9 @@ export const fetchAndSaveActivities = async (
 
         return res.status(200).json(successResponse(newActivitiesCount));
     } catch (err: any) {
-        console.error("Błąd synchronizacji:", err);
+        console.error(err.message);
         return res
             .status(500)
-            .json(errorResponse(null, "Błąd podczas synchronizacji z Garmin"));
+            .json(errorResponse(null, "Internal server error", 500));
     }
 };

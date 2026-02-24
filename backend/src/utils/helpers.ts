@@ -2,6 +2,7 @@ import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import ms from "ms";
 import type { User } from "../types/User";
+import FitParser from "fit-file-parser";
 
 /**
  * Validates a password by comparing it with a hash and a salt.
@@ -63,4 +64,21 @@ export const issueJWT = (user: User, type: "access" | "refresh") => {
         expires: expiresInString,
         expiresInMs: ms(expiresInString) as number,
     };
+};
+
+export const parseFitFile = (fitBuffer: Buffer): Promise<any> => {
+    return new Promise((resolve, reject) => {
+        const fitParser = new FitParser({
+            force: true,
+            speedUnit: "km/h",
+            lengthUnit: "m",
+            temperatureUnit: "celsius",
+            elapsedRecordField: true,
+        });
+
+        fitParser.parse(Buffer.from(fitBuffer), (err: any, data: any) => {
+            if (err) reject(err);
+            else resolve(data);
+        });
+    });
 };

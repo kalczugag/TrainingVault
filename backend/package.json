@@ -12,6 +12,7 @@
     "author": "",
     "license": "ISC",
     "devDependencies": {
+        "@types/adm-zip": "^0.5.7",
         "@types/cors": "^2.8.19",
         "@types/express": "^5.0.6",
         "@types/jsonwebtoken": "^9.0.10",
@@ -28,7 +29,9 @@
     },
     "dependencies": {
         "@flow-js/garmin-connect": "^1.6.7",
+        "adm-zip": "^0.5.16",
         "cors": "^2.8.6",
+        "fit-file-parser": "^2.3.3",
         "joi": "^18.0.2",
         "jsonwebtoken": "^9.0.3",
         "mongoose": "^9.2.1",
