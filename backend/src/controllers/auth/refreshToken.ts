@@ -1,6 +1,5 @@
 import express from "express";
 import jwt from "jsonwebtoken";
-import ms from "ms";
 import { errorResponse } from "../../handlers/apiResponse";
 import { issueJWT } from "../../utils/helpers";
 import { UserModel } from "../../models/User";

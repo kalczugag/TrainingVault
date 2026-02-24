@@ -28,22 +28,25 @@ const stepWorkoutSchema = new mongoose.Schema<WorkoutStep>(
     { _id: false },
 );
 
-export const plannedWorkoutModel = new mongoose.Schema<PlannedWorkout>({
-    athleteId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+export const plannedWorkoutModel = new mongoose.Schema<PlannedWorkout>(
+    {
+        athleteId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+        },
+        createdBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+        },
+        scheduledDate: Date,
+        title: String,
+        sportType: { type: String, enum: SPORT_TYPES, required: true },
+        targetTss: Number,
+        status: { type: String, enum: STATUS, required: true },
+        structure: stepWorkoutSchema,
     },
-    createdBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-    },
-    scheduledDate: Date,
-    title: String,
-    sportType: { type: String, enum: SPORT_TYPES, required: true },
-    targetTss: Number,
-    status: { type: String, enum: STATUS, required: true },
-    structure: stepWorkoutSchema,
-});
+    { timestamps: true },
+);
 
 export const PlannedWorkoutModel = mongoose.model(
     "PlannedWorkout",

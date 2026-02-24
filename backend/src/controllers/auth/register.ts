@@ -1,15 +1,19 @@
 import express from "express";
-import ms from "ms";
 import { errorResponse } from "../../handlers/apiResponse";
 import { genPassword, issueJWT } from "../../utils/helpers";
 import { UserModel } from "../../models/User";
 import schema from "./schemaValidate";
+import { encrypt } from "../../utils/crypto";
 
 interface RegisterRequestBody {
     email: string;
     password: string;
     role?: string;
     coachId?: string;
+    garminCredentials?: {
+        email: string;
+        password: string;
+    };
 }
 
 export const register = async (
@@ -30,13 +34,28 @@ export const register = async (
             );
     }
 
-    const { password } = req.body;
+    const { password, garminCredentials, ...rest } = req.body;
 
     try {
+        let safeGarminCredentials = undefined;
+
+        if (garminCredentials) {
+            const { iv, passwordEncrypted } = encrypt(
+                garminCredentials.password,
+            );
+
+            safeGarminCredentials = {
+                email: garminCredentials.email,
+                passwordEncrypted,
+                iv,
+            };
+        }
+
         const { salt, hash } = genPassword(password);
 
         const newUser = new UserModel({
-            ...req.body,
+            ...rest,
+            garminCredentials: safeGarminCredentials,
             hash,
             salt,
         });

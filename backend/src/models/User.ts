@@ -10,6 +10,15 @@ const refreshTokenSchema = new mongoose.Schema<User["refreshToken"]>(
     { _id: false },
 );
 
+const garminCredentialsSchema = new mongoose.Schema(
+    {
+        email: { type: String, required: true },
+        passwordEncrypted: { type: String, required: true },
+        iv: { type: String, required: true },
+    },
+    { _id: false },
+);
+
 export const userModel = new mongoose.Schema<User>(
     {
         email: { type: String, required: true, unique: true },
@@ -19,9 +28,9 @@ export const userModel = new mongoose.Schema<User>(
             ref: "User",
             default: null,
         },
-        garminAuth: {
-            oauth1Token: String,
-            oauth1TokenSecret: String,
+        garminCredentials: {
+            type: garminCredentialsSchema,
+            select: false,
         },
         metrics: {
             weightKg: Number,

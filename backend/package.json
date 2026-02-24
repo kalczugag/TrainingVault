@@ -27,6 +27,7 @@
         "typescript": "^5.9.3"
     },
     "dependencies": {
+        "@flow-js/garmin-connect": "^1.6.7",
         "cors": "^2.8.6",
         "joi": "^18.0.2",
         "jsonwebtoken": "^9.0.3",

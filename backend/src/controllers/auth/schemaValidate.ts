@@ -5,10 +5,10 @@ const schema = Joi.object({
     password: Joi.string().required(),
     role: Joi.string().optional(),
     coachId: Joi.string().optional(),
-    garminAuth: Joi.object({
-        oauth1Token: Joi.string().optional(),
-        oauth1TokenSecret: Joi.string().optional(),
-    }),
+    garminCredentials: Joi.object({
+        email: Joi.string().email().required(),
+        password: Joi.string().required(),
+    }).optional(),
     metrics: {
         weightKg: Joi.number().optional(),
         maxHr: Joi.number().optional(),

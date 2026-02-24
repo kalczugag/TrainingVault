@@ -1,5 +1,4 @@
 import express from "express";
-import ms from "ms";
 import { errorResponse } from "../../handlers/apiResponse";
 import { validPassword, issueJWT } from "../../utils/helpers";
 import { UserModel } from "../../models/User";

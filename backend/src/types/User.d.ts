@@ -5,9 +5,10 @@ interface User {
     email: string;
     role: Role;
     coachId?: string;
-    garminAuth: {
-        oauth1Token: string;
-        oauth1TokenSecret: string;
+    garminCredentials: {
+        email: string;
+        passwordEncrypted: string;
+        iv: string;
     };
     metrics: {
         weightKg: number;
