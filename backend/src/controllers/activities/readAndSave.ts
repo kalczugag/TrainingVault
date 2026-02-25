@@ -1,8 +1,7 @@
 import express from "express";
-import { GarminConnect } from "@flow-js/garmin-connect";
 import { errorResponse, successResponse } from "../../handlers/apiResponse";
-import { decrypt } from "../../utils/crypto";
 import { getGarminClient } from "../../config/garmin";
+import { recalculatePMC } from "../../config/pmcService";
 import { UserModel } from "../../models/User";
 import { ActivityModel } from "../../models/Activity";
 import type { User } from "../../types/User";
@@ -43,6 +42,7 @@ export const fetchAndSaveActivities = async (
         const limit = 50;
         let keepFetching = true;
         let newActivitiesCount = 0;
+        let oldestActivityDate = new Date();
 
         let userFtp = 251;
         if (user.thresholdHistory && user.thresholdHistory.length > 0) {
@@ -57,9 +57,7 @@ export const fetchAndSaveActivities = async (
         while (keepFetching) {
             const activities = await garminClient.getActivities(start, limit);
 
-            if (!activities || activities.length === 0) {
-                break;
-            }
+            if (!activities || activities.length === 0) break;
 
             for (const garminAct of activities) {
                 const rawAct = garminAct as any;
@@ -76,6 +74,10 @@ export const fetchAndSaveActivities = async (
                 });
 
                 if (!exists) {
+                    if (activityDate > oldestActivityDate) {
+                        oldestActivityDate = activityDate;
+                    }
+
                     const np = safeNum(rawAct.normPower);
                     const duration = safeNum(rawAct.duration);
                     const power = safeNum(
@@ -179,6 +181,10 @@ export const fetchAndSaveActivities = async (
             start += limit;
 
             await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+
+        if (newActivitiesCount > 0) {
+            await recalculatePMC(userId.toString(), oldestActivityDate);
         }
 
         return res.status(200).json(successResponse(newActivitiesCount));

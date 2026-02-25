@@ -33,9 +33,9 @@ export const userModel = new mongoose.Schema<User>(
             select: false,
         },
         metrics: {
-            weightKg: Number,
-            maxHr: Number,
-            restHr: Number,
+            weightKg: { type: Number, default: 0 },
+            maxHr: { type: Number, default: 0 },
+            restHr: { type: Number, default: 0 },
         },
         thresholdHistory: [
             {

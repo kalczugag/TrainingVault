@@ -9,8 +9,6 @@ import type { User } from "../../types/User";
 import { UserModel } from "../../models/User";
 import { ActivityStreamModel } from "../../models/ActivityStream";
 
-interface params {}
-
 export const fetchAndSaveActivityStream = async (
     req: express.Request<
         { dbActivityId: string },
@@ -23,6 +21,16 @@ export const fetchAndSaveActivityStream = async (
         const { dbActivityId } = req.params;
         const { garminActivityId } = req.body;
         const userId = (req.user as User)._id;
+
+        const streamExists = await ActivityStreamModel.exists({
+            "metadata.activityId": dbActivityId,
+        });
+
+        if (streamExists) {
+            return res
+                .status(400)
+                .json(errorResponse(null, "Stream already exists"));
+        }
 
         const user = await UserModel.findById(userId)
             .select("+garminCredentials")

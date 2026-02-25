@@ -3,11 +3,11 @@ interface DailyStat {
     athleteId: string | null;
     date: Date;
     dailyTss: number;
-    pmc: {
-        ctl: number;
-        atl: number;
-        tsb: number;
-    };
+    dailyWorkKj: number;
+    dailyDurationSec: number;
+    ctl: number;
+    atl: number;
+    tsb: number;
 }
 
 export { DailyStat };
