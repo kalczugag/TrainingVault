@@ -3,6 +3,7 @@ import { errorResponse, successResponse } from "../../handlers/apiResponse";
 import { ActivityModel } from "../../models/Activity";
 import type { User } from "../../types/User";
 import { recalculatePMC } from "../../config/pmcService";
+import { recalculateWeeklyStats } from "../../config/weeklyStatService";
 
 // TODO: add option to manual athleteId recalculation
 export const recalculateDailyStats = async (
@@ -27,14 +28,16 @@ export const recalculateDailyStats = async (
             startDate = new Date();
         }
 
-        await recalculatePMC(userId, startDate);
+        await recalculatePMC(userId.toString(), startDate);
+
+        await recalculateWeeklyStats(userId.toString(), startDate);
 
         return res
             .status(200)
             .json(
                 successResponse(
                     null,
-                    `Successfully recalculated daily stats from ${startDate.toISOString().split("T")[0]}`,
+                    `Successfully recalculated daily and weekly stats from ${startDate.toISOString().split("T")[0]}`,
                 ),
             );
     } catch (err: any) {
