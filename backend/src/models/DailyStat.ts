@@ -11,6 +11,8 @@ export const dailyStatModel = new mongoose.Schema<DailyStat>({
     dailyTss: { type: Number, default: 0 },
     dailyWorkKj: { type: Number, default: 0 },
     dailyDurationSec: { type: Number, default: 0 },
+    dailyDistanceMeters: { type: Number, default: 0 },
+    dailyElevationGain: { type: Number, default: 0 },
     ctl: { type: Number, default: 0 },
     atl: { type: Number, default: 0 },
     tsb: { type: Number, default: 0 },

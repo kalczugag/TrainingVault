@@ -10,6 +10,18 @@ interface Activity {
     startTime: Date;
     durationSec: number;
     distanceMeters: number;
+    laps?: {
+        lapIndex: number;
+        startTime: Date;
+        durationSec: number;
+        distanceMeters: number;
+        avgPower: number;
+        maxPower: number;
+        avgHr: number;
+        maxHr: number;
+        avgCadence: number;
+        avgSpeed: number;
+    }[];
     summary: {
         tss: number;
         np: number;

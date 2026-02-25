@@ -8,6 +8,7 @@ import { getGarminClient } from "../../config/garmin";
 import type { User } from "../../types/User";
 import { UserModel } from "../../models/User";
 import { ActivityStreamModel } from "../../models/ActivityStream";
+import { ActivityModel } from "../../models/Activity";
 
 export const fetchAndSaveActivityStream = async (
     req: express.Request<
@@ -109,6 +110,28 @@ export const fetchAndSaveActivityStream = async (
         await ActivityStreamModel.insertMany(streamDataToInsert, {
             ordered: false,
         });
+
+        if (parsedData.laps && parsedData.laps.length > 0) {
+            const lapsToInsert = parsedData.laps.map(
+                (lap: any, index: number) => ({
+                    lapIndex: index + 1,
+                    startTime: lap.start_time,
+                    durationSec:
+                        lap.total_timer_time || lap.total_elapsed_time || 0,
+                    distanceMeters: lap.total_distance || 0,
+                    avgPower: lap.avg_power || 0,
+                    maxPower: lap.max_power || 0,
+                    avgHr: lap.avg_heart_rate || 0,
+                    maxHr: lap.max_heart_rate || 0,
+                    avgCadence: lap.avg_cadence || 0,
+                    avgSpeed: lap.avg_speed || 0,
+                }),
+            );
+
+            await ActivityModel.findByIdAndUpdate(dbActivityId, {
+                $set: { laps: lapsToInsert },
+            });
+        }
 
         fs.unlinkSync(zipFilePath);
 

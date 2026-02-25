@@ -15,6 +15,20 @@ export const activityModel = new mongoose.Schema<Activity>(
         startTime: Date,
         durationSec: Number,
         distanceMeters: Number,
+        laps: [
+            {
+                lapIndex: Number,
+                startTime: Date,
+                durationSec: Number,
+                distanceMeters: Number,
+                avgPower: Number,
+                maxPower: Number,
+                avgHr: Number,
+                maxHr: Number,
+                avgCadence: Number,
+                avgSpeed: Number,
+            },
+        ],
         summary: {
             tss: { type: Number, default: 0 },
             np: { type: Number, default: 0 },

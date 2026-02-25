@@ -38,6 +38,8 @@ export const recalculatePMC = async (athleteId: string, startDate: Date) => {
                 dailyTss: { $sum: "$summary.tss" },
                 dailyWorkKj: { $sum: "$summary.workKj" },
                 dailyDurationSec: { $sum: "$durationSec" },
+                dailyDistanceMeters: { $sum: "$distanceMeters" },
+                dailyElevationGain: { $sum: "$summary.elevationGain" },
             },
         },
     ]);
@@ -58,9 +60,17 @@ export const recalculatePMC = async (athleteId: string, startDate: Date) => {
         const dateString = currentDate.toISOString().split("T")[0];
         const todaysActivity = activitiesMap[dateString];
 
+        if (todaysActivity && todaysActivity.dailyDurationSec > 0) {
+            console.log(
+                `[DEBUG] Dzień: ${dateString} | Dystans: ${todaysActivity.dailyDistanceMeters} | Przewyższenia: ${todaysActivity.dailyElevationGain}`,
+            );
+        }
+
         const dailyTss = todaysActivity?.dailyTss || 0;
         const dailyWorkKj = todaysActivity?.dailyWorkKj || 0;
         const dailyDurationSec = todaysActivity?.dailyDurationSec || 0;
+        const dailyDistanceMeters = todaysActivity?.dailyDistanceMeters || 0;
+        const dailyElevationGain = todaysActivity?.dailyElevationGain || 0;
 
         const currentTsb = prevCtl - prevAtl;
         const currentCtl = prevCtl + (dailyTss - prevCtl) * (1 / 42);
@@ -74,6 +84,8 @@ export const recalculatePMC = async (athleteId: string, startDate: Date) => {
                         dailyTss,
                         dailyWorkKj,
                         dailyDurationSec,
+                        dailyDistanceMeters,
+                        dailyElevationGain,
                         ctl: currentCtl,
                         atl: currentAtl,
                         tsb: currentTsb,

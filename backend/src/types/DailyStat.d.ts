@@ -5,6 +5,8 @@ interface DailyStat {
     dailyTss: number;
     dailyWorkKj: number;
     dailyDurationSec: number;
+    dailyElevationGain: number;
+    dailyDistanceMeters: number;
     ctl: number;
     atl: number;
     tsb: number;

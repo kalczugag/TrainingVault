@@ -45,7 +45,9 @@ export const genPassword = (password: string) => {
  */
 export const issueJWT = (user: User, type: "access" | "refresh") => {
     const _id = user._id;
-    const expiresInString = type === "access" ? "15m" : "7d";
+
+    // const expiresInString = type === "access" ? "15m" : "7d";
+    const expiresInString = "7d";
 
     const secret = process.env.JWT_SECRET!;
 
