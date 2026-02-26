@@ -4,6 +4,7 @@ import { getGarminClient } from "../../config/garmin";
 import { recalculatePMC } from "../../config/pmcService";
 import { UserModel } from "../../models/User";
 import { ActivityModel } from "../../models/Activity";
+import { PlannedWorkoutModel } from "../../models/PlannedWorkout";
 import type { User } from "../../types/User";
 
 const safeNum = (value: unknown): number => {
@@ -174,6 +175,25 @@ export const fetchAndSaveActivities = async (
                             },
                         },
                     });
+
+                    const startOfDay = new Date(activityDate);
+                    startOfDay.setUTCHours(0, 0, 0, 0);
+
+                    const endOfDay = new Date(activityDate);
+                    endOfDay.setUTCHours(23, 59, 59, 999);
+
+                    await PlannedWorkoutModel.findOneAndUpdate(
+                        {
+                            athleteId: userId,
+                            scheduledDate: { $gte: startOfDay, $lt: endOfDay },
+                            status: "scheduled",
+                        },
+                        {
+                            $set: { status: "completed" },
+                        },
+                        { sort: { scheduledDate: 1 } },
+                    );
+
                     newActivitiesCount++;
                 }
             }

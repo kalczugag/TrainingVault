@@ -2,6 +2,7 @@ import express from "express";
 import passport from "passport";
 
 import methods from "../../../controllers/plannedWorkouts";
+import { validatePlannedWorkout } from "../../../middlewares/validatePlannedWorkout";
 
 const plannedWorkouts = (router: express.Router) => {
     router.get(
@@ -17,6 +18,7 @@ const plannedWorkouts = (router: express.Router) => {
         passport.authenticate(["jwt"], {
             session: false,
         }),
+        validatePlannedWorkout,
         methods.create,
     );
 
@@ -25,6 +27,7 @@ const plannedWorkouts = (router: express.Router) => {
         passport.authenticate(["jwt"], {
             session: false,
         }),
+        validatePlannedWorkout,
         methods.update,
     );
 
