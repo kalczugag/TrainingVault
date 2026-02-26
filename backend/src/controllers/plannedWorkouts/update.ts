@@ -19,7 +19,7 @@ export const updatePlannedWorkout = async (
         const updatedWorkout = await PlannedWorkoutModel.findOneAndUpdate(
             { _id: id, athleteId: userId },
             { $set: updateData },
-            { new: true, runValidators: true },
+            { new: true },
         );
 
         if (!updatedWorkout) {

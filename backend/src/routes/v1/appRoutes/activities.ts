@@ -2,6 +2,7 @@ import express from "express";
 import passport from "passport";
 
 import methods from "../../../controllers/activities";
+import { syncLimiter } from "../../../middlewares/rateLimiter";
 
 const activities = (router: express.Router) => {
     router.get(
@@ -17,6 +18,7 @@ const activities = (router: express.Router) => {
         passport.authenticate(["jwt"], {
             session: false,
         }),
+        syncLimiter,
         methods.readAndSave,
     );
 
