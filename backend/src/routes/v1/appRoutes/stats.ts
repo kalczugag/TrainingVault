@@ -1,9 +1,9 @@
 import express from "express";
 import passport from "passport";
 
-import methods from "../../../controllers/dailyStats";
+import methods from "../../../controllers/stats";
 
-const dailyStats = (router: express.Router) => {
+const stats = (router: express.Router) => {
     router.post(
         "/stats/recalculate",
         passport.authenticate(["jwt"], {
@@ -13,4 +13,4 @@ const dailyStats = (router: express.Router) => {
     );
 };
 
-export default dailyStats;
+export default stats;
