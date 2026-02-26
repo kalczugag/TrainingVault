@@ -6,7 +6,7 @@ import { recalculatePMC } from "../../config/pmcService";
 import { recalculateWeeklyStats } from "../../config/weeklyStatService";
 
 // TODO: add option to manual athleteId recalculation
-export const recalculateDailyStats = async (
+export const recalculateDailyAndWeeklyStats = async (
     req: express.Request,
     res: express.Response,
 ) => {

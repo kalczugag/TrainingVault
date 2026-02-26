@@ -21,6 +21,7 @@ interface WorkoutStep {
         startValue: number;
         endValue: number;
     };
+    steps: WorkoutStep[];
 }
 
 interface PlannedWorkout {
@@ -29,10 +30,12 @@ interface PlannedWorkout {
     createdBy: string | null;
     scheduledDate: Date;
     title: string;
+    description: string;
     sportType: SportType;
     targetTss: number;
+    estimatedDurationSec: number;
     status: Status;
-    structure: WorkoutStep;
+    structure: WorkoutStep[];
 }
 
 export { PlannedWorkout, WorkoutStep };

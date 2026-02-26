@@ -1,7 +1,7 @@
-import { recalculateDailyStats } from "./recalculate";
+import { recalculateDailyAndWeeklyStats } from "./recalculate";
 
 const methods = {
-    recalculate: recalculateDailyStats,
+    recalculate: recalculateDailyAndWeeklyStats,
 };
 
 export default methods;
