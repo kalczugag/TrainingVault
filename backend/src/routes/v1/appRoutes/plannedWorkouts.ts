@@ -13,6 +13,14 @@ const plannedWorkouts = (router: express.Router) => {
         methods.read,
     );
 
+    router.get(
+        "/planned-workouts/:id/export/:format",
+        passport.authenticate(["jwt"], {
+            session: false,
+        }),
+        methods.export,
+    );
+
     router.post(
         "/planned-workouts",
         passport.authenticate(["jwt"], {

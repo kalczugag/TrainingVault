@@ -22,6 +22,14 @@ const activities = (router: express.Router) => {
         methods.readAndSave,
     );
 
+    router.get(
+        "/activities/:id/export/:format",
+        passport.authenticate(["jwt"], {
+            session: false,
+        }),
+        methods.export,
+    );
+
     router.post(
         "/activities/:dbActivityId/sync-stream",
         passport.authenticate(["jwt"], {

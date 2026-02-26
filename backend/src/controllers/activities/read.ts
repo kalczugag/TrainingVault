@@ -1,11 +1,11 @@
-import { Request, Response } from "express";
+import express from "express";
 import { successResponse, errorResponse } from "../../handlers/apiResponse";
 import { ActivityModel } from "../../models/Activity";
 import type { User } from "../../types/User";
 
 export const readActivities = async (
-    req: Request<{}, {}, {}, { page: string; limit: string }>,
-    res: Response,
+    req: express.Request<{}, {}, {}, { page: string; limit: string }>,
+    res: express.Response,
 ) => {
     try {
         const userId = (req.user as User)._id;
