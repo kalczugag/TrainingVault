@@ -1,10 +1,16 @@
 import type { Role } from "../constants/user";
+import { SportType } from "../constants/activities";
 
 interface User {
     _id: string;
     email: string;
     role: Role;
     coachId?: string;
+    firstName: string;
+    lastName: string;
+    birthDate: Date;
+    username: string;
+    primarySport?: SportType;
     garminCredentials: {
         email: string;
         passwordEncrypted: string;

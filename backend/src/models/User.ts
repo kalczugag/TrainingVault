@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import type { User } from "../types/User";
 import { USER_ROLES } from "../constants/user";
+import { SPORT_TYPES } from "../constants/activities";
 
 const refreshTokenSchema = new mongoose.Schema<User["refreshToken"]>(
     {
@@ -28,6 +29,11 @@ export const userModel = new mongoose.Schema<User>(
             ref: "User",
             default: null,
         },
+        firstName: { type: String, required: true },
+        lastName: { type: String, required: true },
+        username: { type: String, required: true, unique: true },
+        primarySport: { type: String, enum: SPORT_TYPES, default: null },
+        birthDate: { type: Date, required: true },
         garminCredentials: {
             type: garminCredentialsSchema,
             select: false,
@@ -39,7 +45,7 @@ export const userModel = new mongoose.Schema<User>(
         },
         thresholdHistory: [
             {
-                effectiveFrom: Date,
+                effectiveFrom: { type: Date, required: true },
                 ftp: Number,
                 lthr: Number,
             },
@@ -53,5 +59,7 @@ export const userModel = new mongoose.Schema<User>(
     },
     { timestamps: true },
 );
+
+userModel.index({ username: 1, email: 1 }, { unique: true });
 
 export const UserModel = mongoose.model("User", userModel);
