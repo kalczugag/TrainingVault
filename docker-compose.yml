@@ -1,0 +1,30 @@
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: tv-mongo
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin # ZMIEŃ TO HASŁO!
+      - MONGO_INITDB_DATABASE=trainingvault
+    ports:
+      - '127.0.0.1:27017:27017'
+    volumes:
+      - mongo_data:/data/db
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sport_backend
+    restart: always
+    ports:
+      - '3000:3000'
+    depends_on:
+      - mongodb
+    env_file:
+      - ./backend/.env
+  
+volumes:
+  mongo_data:
