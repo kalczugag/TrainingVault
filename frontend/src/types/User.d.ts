@@ -10,7 +10,7 @@ interface User {
     lastName: string;
     birthDate: Date;
     username: string;
-    primarySport?: SportType;
+    primarySport: SportType;
     garminCredentials: {
         email: string;
         passwordEncrypted: string;

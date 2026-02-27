@@ -5,6 +5,11 @@ const schema = Joi.object({
     password: Joi.string().required(),
     role: Joi.string().optional(),
     coachId: Joi.string().optional(),
+    firstName: Joi.string().required(),
+    lastName: Joi.string().required(),
+    birthDate: Joi.date().required(),
+    username: Joi.string().required(),
+    primarySport: Joi.string().required(),
     garminCredentials: Joi.object({
         email: Joi.string().email().required(),
         password: Joi.string().required(),
