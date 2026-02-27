@@ -6,7 +6,7 @@ services:
     restart: always
     environment:
       - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=admin # ZMIEŃ TO HASŁO!
+      - MONGO_INITDB_ROOT_PASSWORD=admin
       - MONGO_INITDB_DATABASE=trainingvault
     ports:
       - '127.0.0.1:27017:27017'
