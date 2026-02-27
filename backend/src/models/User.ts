@@ -32,7 +32,7 @@ export const userModel = new mongoose.Schema<User>(
         firstName: { type: String, required: true },
         lastName: { type: String, required: true },
         username: { type: String, required: true, unique: true },
-        primarySport: { type: String, enum: SPORT_TYPES, default: null },
+        primarySport: { type: String, enum: SPORT_TYPES, required: true },
         birthDate: { type: Date, required: true },
         garminCredentials: {
             type: garminCredentialsSchema,

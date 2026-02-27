@@ -9,6 +9,7 @@ const schema = Joi.object({
     lastName: Joi.string().required(),
     birthDate: Joi.date().required(),
     username: Joi.string().required(),
+    primarySport: Joi.string().required(),
     garminCredentials: Joi.object({
         email: Joi.string().email().required(),
         password: Joi.string().required(),
