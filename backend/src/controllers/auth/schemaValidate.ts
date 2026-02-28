@@ -14,6 +14,7 @@ const schema = Joi.object({
         email: Joi.string().email().required(),
         password: Joi.string().required(),
     }).optional(),
+    stravaId: Joi.string().optional(),
     metrics: {
         weightKg: Joi.number().optional(),
         maxHr: Joi.number().optional(),

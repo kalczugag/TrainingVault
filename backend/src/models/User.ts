@@ -38,6 +38,11 @@ export const userModel = new mongoose.Schema<User>(
             type: garminCredentialsSchema,
             select: false,
         },
+        stravaId: {
+            type: String,
+            unique: true,
+            sparse: true,
+        },
         metrics: {
             weightKg: { type: Number, default: 0 },
             maxHr: { type: Number, default: 0 },

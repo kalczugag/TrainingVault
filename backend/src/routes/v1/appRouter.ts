@@ -5,6 +5,7 @@ import users from "./appRoutes/users";
 import activities from "./appRoutes/activities";
 import stats from "./appRoutes/stats";
 import plannedWorkouts from "./appRoutes/plannedWorkouts";
+import strava from "./appRoutes/strava";
 
 const router = express.Router();
 
@@ -14,6 +15,7 @@ export default (): express.Router => {
     activities(router);
     stats(router);
     plannedWorkouts(router);
+    strava(router);
 
     return router;
 };

@@ -16,6 +16,7 @@ interface User {
         passwordEncrypted: string;
         iv: string;
     };
+    stravaId: string;
     metrics: {
         weightKg: number;
         maxHr: number;

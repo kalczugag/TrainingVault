@@ -30,6 +30,7 @@
     "dependencies": {
         "@flow-js/garmin-connect": "^1.6.7",
         "adm-zip": "^0.5.16",
+        "axios": "^1.13.6",
         "cors": "^2.8.6",
         "express-rate-limit": "^8.2.1",
         "fit-file-parser": "^2.3.3",
