@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import type { Activity } from "../types/Activity";
 import { SPORT_TYPES } from "../constants/activities";
 
-export const activityModel = new mongoose.Schema<Activity>(
+export const activitySchema = new mongoose.Schema<Activity>(
     {
         athleteId: {
             type: mongoose.Schema.Types.ObjectId,
@@ -74,4 +74,4 @@ export const activityModel = new mongoose.Schema<Activity>(
     { timestamps: true },
 );
 
-export const ActivityModel = mongoose.model("Activity", activityModel);
+export const ActivityModel = mongoose.model("Activity", activitySchema);

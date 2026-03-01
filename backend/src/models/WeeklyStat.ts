@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import type { WeeklyStat } from "../types/WeeklyStat";
 
-export const weeklyStatModel = new mongoose.Schema<WeeklyStat>({
+export const weeklyStatSchema = new mongoose.Schema<WeeklyStat>({
     athleteId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
@@ -30,6 +30,6 @@ export const weeklyStatModel = new mongoose.Schema<WeeklyStat>({
     },
 });
 
-weeklyStatModel.index({ athleteId: 1, weekStartDate: 1 }, { unique: true });
+weeklyStatSchema.index({ athleteId: 1, weekStartDate: 1 }, { unique: true });
 
-export const WeeklyStatModel = mongoose.model("WeeklyStat", weeklyStatModel);
+export const WeeklyStatModel = mongoose.model("WeeklyStat", weeklyStatSchema);

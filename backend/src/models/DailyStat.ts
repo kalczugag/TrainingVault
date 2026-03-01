@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import type { DailyStat } from "../types/DailyStat";
 
-export const dailyStatModel = new mongoose.Schema<DailyStat>({
+export const dailyStatSchema = new mongoose.Schema<DailyStat>({
     athleteId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
@@ -18,6 +18,6 @@ export const dailyStatModel = new mongoose.Schema<DailyStat>({
     tsb: { type: Number, default: 0 },
 });
 
-dailyStatModel.index({ athleteId: 1, date: 1 }, { unique: true });
+dailyStatSchema.index({ athleteId: 1, date: 1 }, { unique: true });
 
-export const DailyStatModel = mongoose.model("DailyStat", dailyStatModel);
+export const DailyStatModel = mongoose.model("DailyStat", dailyStatSchema);

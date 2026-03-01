@@ -5,6 +5,7 @@ import { recalculatePMC } from "./pmcService";
 import { ActivityModel } from "../models/Activity";
 import { PlannedWorkoutModel } from "../models/PlannedWorkout";
 import { UserModel } from "../models/User";
+import { UserStatModel } from "../models/UserStat";
 
 const clientsCache = new Map<string, GarminConnect>();
 
@@ -39,6 +40,42 @@ export const getGarminClient = async (
 
 export const removeGarminClient = (userId: string) => {
     clientsCache.delete(userId);
+};
+
+const updateTop3 = (
+    currentTop3: any[],
+    newEffort: any,
+    isTime: boolean = false,
+) => {
+    const existsIndex = currentTop3.findIndex(
+        (e) => e.garminActivityId === newEffort.garminActivityId,
+    );
+
+    if (existsIndex !== -1) {
+        if (
+            isTime
+                ? newEffort.value < currentTop3[existsIndex].value
+                : newEffort.value > currentTop3[existsIndex].value
+        ) {
+            currentTop3[existsIndex] = newEffort;
+        } else {
+            return false;
+        }
+    } else {
+        currentTop3.push(newEffort);
+    }
+
+    if (isTime) {
+        currentTop3.sort((a, b) => a.value - b.value);
+    } else {
+        currentTop3.sort((a, b) => b.value - a.value);
+    }
+
+    currentTop3.splice(3);
+
+    return currentTop3.some(
+        (e) => e.garminActivityId === newEffort.garminActivityId,
+    );
 };
 
 const safeNum = (value: unknown): number => {
@@ -152,7 +189,7 @@ export const syncGarminForUser = async (userId: string): Promise<number> => {
                 safeNum(rawAct.powerTimeInZone_7),
             ];
 
-            await ActivityModel.create({
+            const newActivity = await ActivityModel.create({
                 athleteId: userId,
                 garminActivityId: rawAct.activityId.toString(),
                 title: rawAct.activityName || "Trening",
@@ -206,6 +243,61 @@ export const syncGarminForUser = async (userId: string): Promise<number> => {
                 },
             });
 
+            let userStats = await UserStatModel.findOne({ athleteId: userId });
+            if (!userStats) {
+                userStats = new UserStatModel({ athleteId: userId });
+            }
+
+            let isModified = false;
+
+            const baseEffort = {
+                activityId: newActivity._id,
+                garminActivityId: rawAct.activityId.toString(),
+                date: activityDate,
+            };
+
+            const powerKeys = [
+                "p1s",
+                "p5s",
+                "p20s",
+                "p60s",
+                "p300s",
+                "p1200s",
+                "p3600s",
+            ];
+            powerKeys.forEach((key) => {
+                const garminKey = `maxAvgPower_${key.replace("p", "").replace("s", "")}`;
+                const value = safeNum(rawAct[garminKey]);
+
+                if (value > 0) {
+                    const updated = updateTop3(
+                        userStats.cycling.powerCurve[key],
+                        { ...baseEffort, value },
+                    );
+                    if (updated) isModified = true;
+                }
+            });
+
+            const distanceValue = safeNum(rawAct.distance);
+            if (distanceValue > 0) {
+                const updated = updateTop3(userStats.cycling.longestRide, {
+                    ...baseEffort,
+                    value: distanceValue,
+                });
+                if (updated) isModified = true;
+            }
+
+            const elevationGain = safeNum(rawAct.elevationGain);
+            if (elevationGain > 0) {
+                const updated = updateTop3(
+                    userStats.cycling.elevation.maxElevationGain,
+                    { ...baseEffort, value: elevationGain },
+                );
+                if (updated) isModified = true;
+            }
+
+            if (isModified) await userStats.save();
+
             const startOfDay = new Date(activityDate);
             startOfDay.setUTCHours(0, 0, 0, 0);
             const endOfDay = new Date(activityDate);
@@ -235,4 +327,73 @@ export const syncGarminForUser = async (userId: string): Promise<number> => {
     }
 
     return newActivitiesCount;
+};
+
+export const recalculateAllUserStats = async (userId: string) => {
+    await UserStatModel.findOneAndDelete({ athleteId: userId });
+
+    const userStats = new UserStatModel({ athleteId: userId });
+
+    const activities = await ActivityModel.find({
+        athleteId: userId,
+        sportType: "cycling",
+    }).sort({ startTime: 1 });
+
+    if (!activities || activities.length === 0) {
+        return { message: "No activities to process", count: 0 };
+    }
+
+    for (const act of activities) {
+        const baseEffort = {
+            activityId: act._id,
+            garminActivityId: act.garminActivityId,
+            date: act.startTime,
+        };
+
+        const powerKeys = [
+            "p1s",
+            "p5s",
+            "p20s",
+            "p60s",
+            "p300s",
+            "p1200s",
+            "p3600s",
+        ];
+        powerKeys.forEach((key) => {
+            const value =
+                act.summary?.powerCurve?.[
+                    key as keyof typeof act.summary.powerCurve
+                ] || 0;
+
+            if (value > 0) {
+                updateTop3(userStats.cycling.powerCurve[key], {
+                    ...baseEffort,
+                    value,
+                });
+            }
+        });
+
+        const distanceValue = act.distanceMeters || 0;
+        if (distanceValue > 0) {
+            updateTop3(userStats.cycling.longestRide, {
+                ...baseEffort,
+                value: distanceValue,
+            });
+        }
+
+        const elevationGain = act.summary?.elevationGain || 0;
+        if (elevationGain > 0) {
+            updateTop3(userStats.cycling.elevation.maxElevationGain, {
+                ...baseEffort,
+                value: elevationGain,
+            });
+        }
+    }
+
+    await userStats.save();
+
+    return {
+        message: "User stats recalculated successfully",
+        analyzedActivities: activities.length,
+    };
 };

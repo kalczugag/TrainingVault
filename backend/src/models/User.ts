@@ -47,7 +47,7 @@ const zoneConfigSchema = new mongoose.Schema<ZoneConfig>(
     { _id: false },
 );
 
-export const userModel = new mongoose.Schema<User>(
+export const userSchema = new mongoose.Schema<User>(
     {
         email: { type: String, required: true, unique: true },
         role: { type: String, enum: USER_ROLES, default: "athlete" },
@@ -107,6 +107,6 @@ export const userModel = new mongoose.Schema<User>(
     { timestamps: true },
 );
 
-userModel.index({ username: 1, email: 1 }, { unique: true });
+userSchema.index({ username: 1, email: 1 }, { unique: true });
 
-export const UserModel = mongoose.model("User", userModel);
+export const UserModel = mongoose.model("User", userSchema);

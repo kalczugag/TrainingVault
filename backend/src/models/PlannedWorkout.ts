@@ -35,7 +35,7 @@ stepWorkoutSchema.add({
     },
 });
 
-export const plannedWorkoutModel = new mongoose.Schema<PlannedWorkout>(
+export const plannedWorkoutSchema = new mongoose.Schema<PlannedWorkout>(
     {
         athleteId: {
             type: mongoose.Schema.Types.ObjectId,
@@ -58,9 +58,9 @@ export const plannedWorkoutModel = new mongoose.Schema<PlannedWorkout>(
     { timestamps: true },
 );
 
-plannedWorkoutModel.index({ athleteId: 1, scheduledDate: 1 });
+plannedWorkoutSchema.index({ athleteId: 1, scheduledDate: 1 });
 
 export const PlannedWorkoutModel = mongoose.model(
     "PlannedWorkout",
-    plannedWorkoutModel,
+    plannedWorkoutSchema,
 );
