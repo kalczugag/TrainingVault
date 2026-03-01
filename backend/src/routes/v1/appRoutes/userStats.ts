@@ -3,7 +3,7 @@ import passport from "passport";
 
 import methods from "../../../controllers/efforts";
 
-const strava = (router: express.Router) => {
+const userStats = (router: express.Router) => {
     router.post(
         "/recalculate-stats",
         passport.authenticate(["jwt"], {
@@ -13,4 +13,4 @@ const strava = (router: express.Router) => {
     );
 };
 
-export default strava;
+export default userStats;
