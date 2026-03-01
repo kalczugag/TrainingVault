@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
-import type { User } from "../types/User";
-import { USER_ROLES } from "../constants/user";
+import type { User, ZoneConfig, ZoneItem } from "../types/User";
+import {
+    USER_ROLES,
+    UNIT_SYSTEMS,
+    START_OF_WEEK_OPTIONS,
+    CALCULATION_METHODS,
+} from "../constants/user";
 import { SPORT_TYPES } from "../constants/activities";
 
 const refreshTokenSchema = new mongoose.Schema<User["refreshToken"]>(
@@ -16,6 +21,28 @@ const garminCredentialsSchema = new mongoose.Schema(
         email: { type: String, required: true },
         passwordEncrypted: { type: String, required: true },
         iv: { type: String, required: true },
+    },
+    { _id: false },
+);
+
+const zoneItemSchema = new mongoose.Schema<ZoneItem>(
+    {
+        name: { type: String, required: true },
+        min: { type: Number, required: true },
+        max: { type: Number, required: true },
+    },
+    { _id: false },
+);
+
+const zoneConfigSchema = new mongoose.Schema<ZoneConfig>(
+    {
+        isCustom: { type: Boolean, default: false },
+        calculationMethod: {
+            type: String,
+            enum: CALCULATION_METHODS,
+            default: "maxHr",
+        },
+        zones: { type: [zoneItemSchema], default: [] },
     },
     { _id: false },
 );
@@ -55,6 +82,21 @@ export const userModel = new mongoose.Schema<User>(
                 lthr: Number,
             },
         ],
+        zones: {
+            hr: { type: zoneConfigSchema, default: () => ({}) },
+            power: {
+                type: zoneConfigSchema,
+                default: () => ({ calculationMethod: "ftp" }),
+            },
+        },
+        preferences: {
+            unitSystem: { type: String, enum: UNIT_SYSTEMS, default: "metric" },
+            startOfWeek: {
+                type: String,
+                enum: START_OF_WEEK_OPTIONS,
+                default: "monday",
+            },
+        },
         hash: { type: String, select: false },
         salt: { type: String, select: false },
         refreshToken: {

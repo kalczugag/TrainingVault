@@ -1,5 +1,22 @@
-import type { Role } from "../constants/user";
-import { SportType } from "../constants/activities";
+import type {
+    Role,
+    UnitSystem,
+    StartOfWeek,
+    CalculationMethod,
+} from "../constants/user";
+import type { SportType } from "../constants/activities";
+
+interface ZoneItem {
+    name: string;
+    min: number;
+    max: number;
+}
+
+interface ZoneConfig {
+    isCustom: boolean;
+    calculationMethod: CalculationMethod;
+    zones: ZoneItem[];
+}
 
 interface User {
     _id: string;
@@ -27,6 +44,14 @@ interface User {
         ftp: number;
         lthr: number;
     }[];
+    zones: {
+        hr: ZoneConfig;
+        power: ZoneConfig;
+    };
+    preferences: {
+        unitSystem: UnitSystem;
+        startOfWeek: StartOfWeek;
+    };
     hash: string;
     salt: string;
     refreshToken: {
@@ -37,4 +62,4 @@ interface User {
     updatedAt: Date;
 }
 
-export { User };
+export { User, ZoneConfig, ZoneItem };
