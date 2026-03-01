@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { ActivityModel } from "../models/Activity";
-import { dailyStatModel, DailyStatModel } from "../models/DailyStat";
+import { DailyStatModel } from "../models/DailyStat";
 import { WeeklyStatModel } from "../models/WeeklyStat";
 
 const getMondayUTC = (date: Date): Date => {
