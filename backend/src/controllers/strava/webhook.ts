@@ -26,7 +26,12 @@ export const stravaWebhook = async (
 
             if (user) {
                 console.log("user found");
-                syncGarminForUser(user._id).catch((err) => console.error(err));
+
+                setTimeout(() => {
+                    syncGarminForUser(user._id).catch((err) =>
+                        console.error(err),
+                    );
+                }, 60000);
             } else {
                 console.error("User not found");
             }
