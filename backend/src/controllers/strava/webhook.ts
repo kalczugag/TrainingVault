@@ -12,6 +12,10 @@ export const stravaWebhook = async (
 ) => {
     const { object_type, aspect_type, owner_id } = req.body;
 
+    console.log(
+        `Event received ${object_type} ${aspect_type} from user ${owner_id}`,
+    );
+
     res.status(200).send("EVENT_RECEIVED");
 
     if (object_type === "activity" && aspect_type === "create") {
@@ -21,6 +25,7 @@ export const stravaWebhook = async (
             });
 
             if (user) {
+                console.log("user found");
                 syncGarminForUser(user._id).catch((err) => console.error(err));
             } else {
                 console.error("User not found");
