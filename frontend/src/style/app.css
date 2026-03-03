@@ -1,0 +1,4 @@
+@import "tailwindcss";
+
+@import "./partials/core.css";
+@import "./partials/auth.css";
