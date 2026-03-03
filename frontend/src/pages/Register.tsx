@@ -1,31 +1,39 @@
+import { useState } from "react";
 import { Form, Button } from "antd";
-import Loading from "@/components/Loading";
+import { omit } from "@/utils/helpers";
 import RegisterForm from "@/forms/RegisterForm";
-import type { FieldType } from "@/forms/LoginForm";
+import type { FieldType } from "@/forms/RegisterForm";
 import AuthModule from "@/modules/AuthModule";
 
 const Register = () => {
-    const handleSubmit = (values: FieldType) => {
-        console.log(values);
-    };
+    const [isLoading, setIsLoading] = useState(false);
 
-    const isLoading = false;
+    const handleSubmit = (values: FieldType) => {
+        setIsLoading(true);
+
+        const { month, day, year } = values.birthDate;
+
+        const date = new Date(
+            parseInt(year),
+            parseInt(month) - 1,
+            parseInt(day),
+        );
+        const firstName = values.fullName.split(" ")[0];
+        const lastName = values.fullName.split(" ")[1];
+        const data = omit(values, ["fullName"]);
+
+        console.log({ ...data, firstName, lastName, birthDate: date });
+    };
 
     const FormContainer = () => {
         return (
-            <Loading isLoading={isLoading}>
+            <div>
                 <Form
                     layout="vertical"
                     name="normal_register"
                     className="register-form"
-                    initialValues={{
-                        fullName: "",
-                        email: "",
-                        username: "",
-                        password: "",
-                        birthDate: "",
-                    }}
                     onFinish={handleSubmit}
+                    disabled={isLoading}
                 >
                     <RegisterForm />
                     <Form.Item>
@@ -33,6 +41,7 @@ const Register = () => {
                             type="primary"
                             htmlType="submit"
                             loading={isLoading}
+                            disabled={false}
                             size="large"
                             block
                         >
@@ -45,7 +54,7 @@ const Register = () => {
                         Already have an account? <a href="/login">Log In</a>
                     </span>
                 </div>
-            </Loading>
+            </div>
         );
     };
 
