@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 
 import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
 
 import appRouter from "./routes/v1/appRouter";
 import { globalLimiter } from "./middlewares/rateLimiter";
@@ -17,6 +18,8 @@ app.use(
         credentials: true,
     }),
 );
+
+app.use(cookieParser());
 
 app.use(bodyParser.json());
 

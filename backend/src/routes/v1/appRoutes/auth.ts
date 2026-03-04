@@ -17,7 +17,11 @@ const auth = (router: express.Router) => {
 
     router.get("/auth/logout", methods.logout);
 
-    router.post("/auth/login", authLimiter, methods.login);
+    router.post(
+        "/auth/login",
+        // authLimiter, //temporary disabled
+        methods.login,
+    );
 
     router.post("/auth/register", authLimiter, methods.register);
 };

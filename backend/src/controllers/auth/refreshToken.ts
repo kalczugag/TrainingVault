@@ -16,15 +16,16 @@ export const refreshToken = async (
             .json(errorResponse(null, "Refresh token required", 403));
     }
 
-    let token = cookies.refreshToken;
+    let rawCookieToken = decodeURIComponent(cookies.refreshToken);
+    let jwtTokenToVerify = rawCookieToken;
 
-    if (token.startsWith("Bearer ")) {
-        token = token.slice(7);
+    if (rawCookieToken.startsWith("Bearer ")) {
+        jwtTokenToVerify = rawCookieToken.slice(7);
     }
 
     try {
         const decoded = jwt.verify(
-            token,
+            jwtTokenToVerify,
             process.env.JWT_SECRET!,
         ) as jwt.JwtPayload;
 
@@ -38,7 +39,10 @@ export const refreshToken = async (
                 .json(errorResponse(null, "User not found", 401));
         }
 
-        if (user.refreshToken?.token !== token) {
+        if (
+            user.refreshToken?.token !== rawCookieToken &&
+            user.refreshToken?.token !== jwtTokenToVerify
+        ) {
             return res
                 .status(403)
                 .json(errorResponse(null, "Invalid refresh token", 403));
