@@ -2,6 +2,7 @@ import { useLocation, Navigate, Outlet } from "react-router-dom";
 import { useRefreshTokenQuery } from "@/store";
 import useAuth from "@/hooks/useAuth";
 import Loading from "@/components/Loading";
+import NavigationLayout from "@/layouts/NavigationLayout";
 
 const RequireAuth = () => {
     const { token } = useAuth();
@@ -18,7 +19,9 @@ const RequireAuth = () => {
     }
 
     return token ? (
-        <Outlet />
+        <NavigationLayout>
+            <Outlet />
+        </NavigationLayout>
     ) : (
         <Navigate to="/login" state={{ from: location }} replace />
     );

@@ -63,9 +63,16 @@ export const refreshToken = async (
 
         return res.status(200).json({
             success: true,
-            userId: user._id,
-            role: user.role,
-            email: user.email,
+            user: {
+                id: user._id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                username: user.username,
+                role: user.role,
+                primarySport: user.primarySport,
+                preferences: user.preferences,
+            },
             ...accessToken,
         });
     } catch (err) {

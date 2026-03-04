@@ -50,9 +50,16 @@ export const login = async (req: express.Request, res: express.Response) => {
 
         return res.status(200).json({
             success: true,
-            userId: existingUser._id,
-            role: existingUser.role,
-            email: existingUser.email,
+            user: {
+                id: existingUser._id,
+                firstName: existingUser.firstName,
+                lastName: existingUser.lastName,
+                email: existingUser.email,
+                username: existingUser.username,
+                role: existingUser.role,
+                primarySport: existingUser.primarySport,
+                preferences: existingUser.preferences,
+            },
             ...accessToken,
         });
     } catch (err: any) {

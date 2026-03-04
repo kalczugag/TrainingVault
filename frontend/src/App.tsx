@@ -2,7 +2,8 @@ import { Routes, Route } from "react-router-dom";
 
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
-import PrivateOutlet from "@/pages/PrivateOutlet";
+import Dashboard from "@/pages/Dashboard";
+import PrivateOutlet from "@/pages/Outlets/PrivateOutlet";
 
 const App = () => {
     return (
@@ -10,7 +11,7 @@ const App = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route element={<PrivateOutlet />}>
-                <Route index element={<h1>Dashboard</h1>} />
+                <Route index element={<Dashboard />} />
             </Route>
         </Routes>
     );

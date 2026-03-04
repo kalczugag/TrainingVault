@@ -77,9 +77,16 @@ export const register = async (
 
         return res.status(201).json({
             success: true,
-            userId: newUser._id,
-            role: newUser.role,
-            email: newUser.email,
+            user: {
+                id: newUser._id,
+                firstName: newUser.firstName,
+                lastName: newUser.lastName,
+                email: newUser.email,
+                username: newUser.username,
+                role: newUser.role,
+                primarySport: newUser.primarySport,
+                preferences: newUser.preferences,
+            },
             ...accessToken,
         });
     } catch (err: any) {
