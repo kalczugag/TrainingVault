@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, Button } from "antd";
+import _ from "lodash";
 import { useRegisterMutation } from "@/store";
-import { omit } from "@/utils/helpers";
 import RegisterForm from "@/forms/RegisterForm";
 import type { FieldType } from "@/forms/RegisterForm";
 import AuthModule from "@/modules/AuthModule";
@@ -25,7 +25,7 @@ const Register = () => {
         );
         const firstName = values.fullName.split(" ")[0];
         const lastName = values.fullName.split(" ")[1];
-        const data = omit(values, ["fullName"]);
+        const data = _.omit(values, ["fullName", "agreement"]);
 
         await register({ ...data, firstName, lastName, birthDate: date });
     };

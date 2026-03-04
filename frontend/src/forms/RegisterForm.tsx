@@ -16,6 +16,7 @@ export type FieldType = {
         day: string;
         year: string;
     };
+    agreement?: boolean;
 };
 
 const RegisterForm = () => {
