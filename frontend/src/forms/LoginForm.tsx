@@ -1,9 +1,8 @@
 import { Form, Input, Checkbox } from "antd";
 
 export type FieldType = {
-    email?: string;
-    password?: string;
-    remember?: string;
+    email: string;
+    password: string;
 };
 
 const LoginForm = () => {
@@ -23,16 +22,6 @@ const LoginForm = () => {
                 rules={[{ required: true, message: "Password is required" }]}
             >
                 <Input.Password placeholder="Password" size="large" />
-            </Form.Item>
-
-            <Form.Item>
-                <Form.Item<FieldType>
-                    name="remember"
-                    valuePropName="checked"
-                    noStyle
-                >
-                    <Checkbox>Remember me</Checkbox>
-                </Form.Item>
             </Form.Item>
         </div>
     );

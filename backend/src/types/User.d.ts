@@ -27,7 +27,8 @@ interface User {
     lastName: string;
     birthDate: Date;
     username: string;
-    primarySport?: SportType;
+    primarySport: SportType;
+    gender: "male" | "female";
     garminCredentials: {
         email: string;
         passwordEncrypted: string;

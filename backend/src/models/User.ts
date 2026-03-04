@@ -60,6 +60,7 @@ export const userSchema = new mongoose.Schema<User>(
         lastName: { type: String, required: true },
         username: { type: String, required: true, unique: true },
         primarySport: { type: String, enum: SPORT_TYPES, required: true },
+        gender: { type: String, enum: ["male", "female"], required: true },
         birthDate: { type: Date, required: true },
         garminCredentials: {
             type: garminCredentialsSchema,

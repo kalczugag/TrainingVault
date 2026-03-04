@@ -7,14 +7,7 @@ import { Mutex } from "async-mutex";
 const mutex = new Mutex();
 
 const baseQuery = fetchBaseQuery({
-    baseUrl:
-        import.meta.env.MODE === "production"
-            ? import.meta.env.VITE_BACKEND_SERVER + "/api/v1"
-            : window.location.protocol +
-              "//" +
-              window.location.host +
-              "/api/v1",
-
+    baseUrl: import.meta.env.VITE_BACKEND_SERVER + "/api/v1",
     credentials: "include",
     prepareHeaders: (headers, { getState }) => {
         const state = getState() as RootState;

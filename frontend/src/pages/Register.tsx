@@ -1,16 +1,21 @@
-import { useState } from "react";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Form, Button } from "antd";
+import { useRegisterMutation } from "@/store";
 import { omit } from "@/utils/helpers";
 import RegisterForm from "@/forms/RegisterForm";
 import type { FieldType } from "@/forms/RegisterForm";
 import AuthModule from "@/modules/AuthModule";
 
 const Register = () => {
-    const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
+    const [register, { isLoading, isSuccess }] = useRegisterMutation();
 
-    const handleSubmit = (values: FieldType) => {
-        setIsLoading(true);
+    useEffect(() => {
+        if (isSuccess) navigate("/");
+    }, [isSuccess]);
 
+    const handleSubmit = async (values: FieldType) => {
         const { month, day, year } = values.birthDate;
 
         const date = new Date(
@@ -22,7 +27,7 @@ const Register = () => {
         const lastName = values.fullName.split(" ")[1];
         const data = omit(values, ["fullName"]);
 
-        console.log({ ...data, firstName, lastName, birthDate: date });
+        await register({ ...data, firstName, lastName, birthDate: date });
     };
 
     const FormContainer = () => {

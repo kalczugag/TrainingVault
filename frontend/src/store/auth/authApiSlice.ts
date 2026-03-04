@@ -1,25 +1,13 @@
 import { apiSlice } from "../apis/apiSlice";
 import { logOut, setCredentials } from "./authSlice";
+import type { FieldType as LoginInput } from "@/forms/LoginForm";
+import type { FieldType as RegisterInput } from "@/forms/RegisterForm";
 
 type AuthResult = {
     expires: string;
     success: boolean;
     isAdmin: boolean;
     token: string;
-};
-
-export type LoginInput = {
-    email: string;
-    password: string;
-    recaptcha?: string;
-};
-
-export type RegisterInput = {
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-    recaptcha?: string;
 };
 
 export const authApiSlice = apiSlice.injectEndpoints({
@@ -38,7 +26,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
                             token: data.token,
                             isAdmin: data.isAdmin,
                             expires: data.expires,
-                        })
+                        }),
                     );
                 } catch (err) {
                     console.error("Login error", err);
@@ -46,7 +34,14 @@ export const authApiSlice = apiSlice.injectEndpoints({
             },
         }),
 
-        register: builder.mutation<AuthResult, RegisterInput>({
+        register: builder.mutation<
+            AuthResult,
+            Omit<RegisterInput, "birthDate" | "fullName"> & {
+                firstName: string;
+                lastName: string;
+                birthDate: Date;
+            }
+        >({
             query: (data) => ({
                 url: "/auth/register",
                 method: "POST",
@@ -60,7 +55,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
                             token: data.token,
                             isAdmin: data.isAdmin,
                             expires: data.expires,
-                        })
+                        }),
                     );
                 } catch (err) {
                     console.error("Register error", err);
@@ -82,7 +77,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
                             token: data.token,
                             isAdmin: data.isAdmin,
                             expires: data.expires,
-                        })
+                        }),
                     );
                 } catch (err) {
                     console.error("Refresh token error", err);

@@ -1,25 +1,32 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Form, Button } from "antd";
-import Loading from "@/components/Loading";
+import { useLoginMutation } from "@/store";
 import LoginForm from "@/forms/LoginForm";
 import type { FieldType } from "@/forms/LoginForm";
 import AuthModule from "@/modules/AuthModule";
 
 const Login = () => {
-    const handleSubmit = (values: FieldType) => {
-        console.log(values);
-    };
+    const navigate = useNavigate();
+    const [login, { isLoading, isSuccess }] = useLoginMutation();
 
-    const isLoading = false;
+    useEffect(() => {
+        if (isSuccess) navigate("/");
+    }, [isSuccess]);
+
+    const handleSubmit = async (values: FieldType) => {
+        await login(values);
+    };
 
     const FormContainer = () => {
         return (
-            <Loading isLoading={isLoading}>
+            <div>
                 <Form
                     layout="vertical"
                     name="normal_login"
                     className="login-form"
+                    disabled={isLoading}
                     initialValues={{
-                        remember: true,
                         email: "",
                         password: "",
                     }}
@@ -31,6 +38,7 @@ const Login = () => {
                             type="primary"
                             htmlType="submit"
                             loading={isLoading}
+                            disabled={false}
                             size="large"
                             block
                         >
@@ -45,7 +53,7 @@ const Login = () => {
                         <a href="/register">Create an Athlete Account</a>
                     </span>
                 </div>
-            </Loading>
+            </div>
         );
     };
 
