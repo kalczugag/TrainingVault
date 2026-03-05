@@ -12,12 +12,12 @@ const NavigationLayout = ({ children }: NavigationLayoutProps) => {
     return (
         <Layout>
             <HeaderContent />
-            <Content style={{ background: "#FFF" }}>
+            <Content style={{ background: "#FFF", padding: "16px" }}>
                 <div>{children}</div>
             </Content>
-            <Footer style={{ textAlign: "center", background: "#FFF" }}>
+            {/* <Footer style={{ textAlign: "center", background: "#FFF" }}>
                 TrainingVault ©{new Date().getFullYear()} Created by kalczugag
-            </Footer>
+            </Footer> */}
         </Layout>
     );
 };

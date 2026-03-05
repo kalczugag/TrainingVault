@@ -1,9 +1,10 @@
 import { Routes, Route } from "react-router-dom";
 
+import PrivateOutlet from "@/pages/Outlets/PrivateOutlet";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import Dashboard from "@/pages/Dashboard";
-import PrivateOutlet from "@/pages/Outlets/PrivateOutlet";
+import Calendar from "@/pages/Calendar";
 
 const App = () => {
     return (
@@ -12,7 +13,7 @@ const App = () => {
             <Route path="/register" element={<Register />} />
             <Route element={<PrivateOutlet />}>
                 <Route index element={<Dashboard />} />
-                <Route path="/calendar" element={<div>calendar</div>} />
+                <Route path="/calendar" element={<Calendar />} />
                 <Route path="/dashboard" element={<div>dasbhoard</div>} />
                 <Route
                     path="/profile"
