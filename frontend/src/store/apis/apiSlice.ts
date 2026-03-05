@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { setCredentials, logOut } from "../auth/authSlice";
+import { setCredentials, logOut, type UserState } from "../auth/authSlice";
 import type { BaseQueryApi, FetchArgs } from "@reduxjs/toolkit/query";
 import type { RootState } from "..";
 import { Mutex } from "async-mutex";
@@ -46,16 +46,13 @@ const baseQueryWithReauth = async (
                     const refreshData = refreshResult.data as {
                         token: string;
                         expires: string;
-                        isAdmin?: boolean;
+                        user: UserState;
                     };
 
                     api.dispatch(
                         setCredentials({
                             token: refreshData.token,
-                            isAdmin:
-                                refreshData.isAdmin !== undefined
-                                    ? refreshData.isAdmin
-                                    : state.auth.isAdmin,
+                            user: refreshData.user,
                             expires: refreshData.expires,
                         }),
                     );

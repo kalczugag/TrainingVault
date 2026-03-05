@@ -2,11 +2,12 @@ import { apiSlice } from "../apis/apiSlice";
 import { logOut, setCredentials } from "./authSlice";
 import type { FieldType as LoginInput } from "@/forms/LoginForm";
 import type { FieldType as RegisterInput } from "@/forms/RegisterForm";
+import type { UserState } from "./authSlice";
 
 type AuthResult = {
     expires: string;
     success: boolean;
-    isAdmin: boolean;
+    user: UserState;
     token: string;
 };
 
@@ -24,7 +25,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
                     dispatch(
                         setCredentials({
                             token: data.token,
-                            isAdmin: data.isAdmin,
+                            user: data.user,
                             expires: data.expires,
                         }),
                     );
@@ -53,7 +54,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
                     dispatch(
                         setCredentials({
                             token: data.token,
-                            isAdmin: data.isAdmin,
+                            user: data.user,
                             expires: data.expires,
                         }),
                     );
@@ -75,7 +76,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
                     dispatch(
                         setCredentials({
                             token: data.token,
-                            isAdmin: data.isAdmin,
+                            user: data.user,
                             expires: data.expires,
                         }),
                     );

@@ -1,15 +1,28 @@
+import type { SportType } from "@/constants/activities";
+import type { Role, UnitSystem } from "@/constants/user";
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
+export interface UserState {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    username: string;
+    role: Role;
+    primarySport: SportType;
+    preferences: UnitSystem;
+}
+
 interface AuthState {
     token: string | null;
-    isAdmin: boolean;
+    user: UserState | null;
     expires: string | null;
 }
 
 const initialState: AuthState = {
     token: null,
-    isAdmin: false,
+    user: null,
     expires: null,
 };
 
@@ -21,7 +34,7 @@ const authSlice = createSlice({
             return {
                 ...state,
                 token: action.payload.token,
-                isAdmin: action.payload.isAdmin,
+                user: action.payload.user,
                 expires: action.payload.expires,
             };
         },
@@ -30,7 +43,7 @@ const authSlice = createSlice({
             return {
                 ...state,
                 token: null,
-                isAdmin: false,
+                user: null,
                 expires: null,
             };
         },

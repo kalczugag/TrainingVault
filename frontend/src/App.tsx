@@ -12,6 +12,14 @@ const App = () => {
             <Route path="/register" element={<Register />} />
             <Route element={<PrivateOutlet />}>
                 <Route index element={<Dashboard />} />
+                <Route path="/calendar" element={<div>calendar</div>} />
+                <Route path="/dashboard" element={<div>dasbhoard</div>} />
+                <Route
+                    path="/profile"
+                    element={
+                        <div>in the future it will be user settings modal</div>
+                    }
+                />
             </Route>
         </Routes>
     );
