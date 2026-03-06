@@ -41,6 +41,10 @@ export const authApiSlice = apiSlice.injectEndpoints({
                 firstName: string;
                 lastName: string;
                 birthDate: Date;
+                garminCredentials?: {
+                    email: string;
+                    password: string;
+                };
             }
         >({
             query: (data) => ({

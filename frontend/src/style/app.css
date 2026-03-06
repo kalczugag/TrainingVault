@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
 @import "./partials/core.css";
+@import "./partials//customAntd.css";
 @import "./partials/auth.css";
 @import "./partials//header.css";

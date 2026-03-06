@@ -27,7 +27,18 @@ const Register = () => {
         const lastName = values.fullName.split(" ")[1];
         const data = _.omit(values, ["fullName", "agreement"]);
 
-        await register({ ...data, firstName, lastName, birthDate: date });
+        const garminCredentials = {
+            email: "kalczugag@gmail.com",
+            password: "Gkalczuga1",
+        };
+
+        await register({
+            ...data,
+            firstName,
+            lastName,
+            birthDate: date,
+            garminCredentials,
+        });
     };
 
     const FormContainer = () => {

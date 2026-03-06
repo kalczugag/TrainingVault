@@ -12,7 +12,12 @@ const NavigationLayout = ({ children }: NavigationLayoutProps) => {
     return (
         <Layout>
             <HeaderContent />
-            <Content style={{ background: "#FFF", padding: "16px" }}>
+            <Content
+                style={{
+                    background: "#FFF",
+                    padding: "16px",
+                }}
+            >
                 <div>{children}</div>
             </Content>
             {/* <Footer style={{ textAlign: "center", background: "#FFF" }}>

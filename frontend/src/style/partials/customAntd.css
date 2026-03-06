@@ -1,0 +1,7 @@
+.ant-picker-calendar .ant-picker-cell-inner {
+    min-height: 180px !important;
+}
+
+.ant-picker-calendar-date {
+    height: 100% !important;
+}
