@@ -23,11 +23,13 @@ interface User {
     birthDate: Date;
     username: string;
     primarySport: SportType;
+    gender: "male" | "female";
     garminCredentials: {
         email: string;
         passwordEncrypted: string;
         iv: string;
     };
+    stravaId: string;
     metrics: {
         weightKg: number;
         maxHr: number;
