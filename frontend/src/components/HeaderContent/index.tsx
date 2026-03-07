@@ -161,6 +161,11 @@ const HeaderContent = () => {
     return (
         <Header
             style={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                zIndex: 999,
                 display: "flex",
                 alignItems: "center",
                 background: "#010F31",

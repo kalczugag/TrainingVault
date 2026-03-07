@@ -1,7 +1,59 @@
-.ant-picker-calendar .ant-picker-cell-inner {
-    min-height: 180px !important;
+.ant-picker-calendar .ant-picker-panel .ant-picker-body table,
+.ant-picker-calendar .ant-picker-panel .ant-picker-body tbody,
+.ant-picker-calendar .ant-picker-panel .ant-picker-body thead {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
 }
 
-.ant-picker-calendar-date {
-    height: 100% !important;
+.ant-picker-calendar .ant-picker-panel .ant-picker-body tr {
+    display: flex !important;
+    width: 100% !important;
+}
+
+.ant-picker-calendar .ant-picker-panel .ant-picker-body th {
+    flex: 1 1 0 !important;
+    text-align: right !important;
+    padding-right: 12px !important;
+}
+
+.ant-picker-calendar .ant-picker-cell {
+    flex: 1 1 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: auto !important;
+}
+
+.ant-picker-calendar .ant-picker-cell-inner {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 140px !important;
+    height: auto !important;
+}
+
+.ant-picker-calendar .ant-picker-calendar-date {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.ant-picker-calendar .ant-picker-calendar-date-content {
+    flex: 1 !important;
+    height: auto !important;
+    overflow-y: visible !important;
+    padding: 2px 6px 8px 6px !important;
+}
+
+.ant-picker-calendar-date-content ul {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+}
+
+.ant-picker-calendar-date-content ul li {
+    margin: 0 !important;
 }

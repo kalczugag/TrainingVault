@@ -14,6 +14,7 @@ const NavigationLayout = ({ children }: NavigationLayoutProps) => {
             <HeaderContent />
             <Content
                 style={{
+                    marginTop: "50px",
                     background: "#FFF",
                     padding: "16px",
                 }}
