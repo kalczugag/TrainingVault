@@ -4,7 +4,7 @@ import { successResponse, errorResponse } from "../../handlers/apiResponse";
 import { ActivityModel } from "../../models/Activity";
 import type { User } from "../../types/User";
 
-export const readActivities = async (
+export const readActivityById = async (
     req: express.Request<{ activityId: string }>,
     res: express.Response,
 ) => {

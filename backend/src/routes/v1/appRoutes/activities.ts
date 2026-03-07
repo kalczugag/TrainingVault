@@ -18,7 +18,7 @@ const activities = (router: express.Router) => {
         passport.authenticate(["jwt"], {
             session: false,
         }),
-        methods.read,
+        methods.readById,
     );
 
     router.get(
