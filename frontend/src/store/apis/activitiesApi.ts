@@ -17,7 +17,7 @@ export const activitiesApi = apiSlice.injectEndpoints({
                 }
 
                 return {
-                    url: "/activites",
+                    url: "/activities",
                     method: "GET",
                     params: queryParams,
                 };
@@ -25,3 +25,5 @@ export const activitiesApi = apiSlice.injectEndpoints({
         }),
     }),
 });
+
+export const { useGetActivitiesQuery } = activitiesApi;

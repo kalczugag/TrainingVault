@@ -21,3 +21,4 @@ export type AppDispatch = typeof store.dispatch;
 
 export * from "./auth/authApiSlice";
 export * from "./apis/apiSlice";
+export * from "./apis/activitiesApi";
