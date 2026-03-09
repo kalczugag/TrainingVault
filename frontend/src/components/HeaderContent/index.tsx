@@ -16,8 +16,8 @@ import {
     LogoutOutlined,
     UserOutlined,
     BellOutlined,
-    FullscreenOutlined,
-    FullscreenExitOutlined,
+    ShrinkOutlined,
+    ArrowsAltOutlined,
 } from "@ant-design/icons";
 import logo from "@/style/images/logo-light.svg";
 import useAuth from "@/hooks/useAuth";
@@ -260,9 +260,9 @@ const HeaderContent = () => {
                     <Button
                         icon={
                             isFullscreen ? (
-                                <FullscreenExitOutlined />
+                                <ShrinkOutlined />
                             ) : (
-                                <FullscreenOutlined />
+                                <ArrowsAltOutlined />
                             )
                         }
                         onClick={toggleFullscreen}

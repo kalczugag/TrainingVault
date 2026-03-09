@@ -5,7 +5,6 @@ import updateLocale from "dayjs/plugin/updateLocale";
 import "dayjs/locale/pl";
 import enGB from "antd/es/locale/pl_PL";
 import duration from "dayjs/plugin/duration";
-import bikeIcon from "@/style/images/bike.svg";
 import { useGetActivitiesQuery } from "@/store";
 import { DownOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
 import {
@@ -18,6 +17,7 @@ import {
     Tooltip,
 } from "antd";
 import { Flex, type CalendarProps } from "antd";
+import ActivityModal from "@/components/ActivityModal";
 
 dayjs.extend(duration);
 dayjs.extend(updateLocale);
@@ -53,41 +53,7 @@ const CalendarModule = () => {
         return (
             <ul>
                 {listData?.map((item) => (
-                    <li
-                        key={item._id}
-                        onClick={() => alert(`clicked ${item.title}`)}
-                        style={{ marginBottom: "8px" }}
-                    >
-                        <Card size="small">
-                            <Card.Meta
-                                title={
-                                    item.sportType === "cycling" && (
-                                        <Flex vertical gap={4}>
-                                            <img
-                                                alt="bike icon"
-                                                src={bikeIcon}
-                                                className="w-6"
-                                            />
-                                            <span className="text-xs">
-                                                {item.title}
-                                            </span>
-                                        </Flex>
-                                    )
-                                }
-                            />
-                            <Flex vertical style={{ marginTop: "10px" }}>
-                                <span>
-                                    {dayjs
-                                        .duration(item.durationSec, "seconds")
-                                        .format("HH:mm:ss")}
-                                </span>
-                                <span>
-                                    {(item.distanceMeters / 1000).toFixed(1)} km
-                                </span>
-                                <span>{item.summary.tss} TSS</span>
-                            </Flex>
-                        </Card>
-                    </li>
+                    <ActivityModal key={item._id} item={item} />
                 ))}
             </ul>
         );
