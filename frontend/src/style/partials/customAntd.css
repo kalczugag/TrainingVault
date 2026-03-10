@@ -42,7 +42,7 @@
     flex: 1 !important;
     height: auto !important;
     overflow-y: visible !important;
-    padding: 2px 6px 8px 6px !important;
+    padding: 2px 0px 8px 0px !important;
 }
 
 .ant-picker-calendar-date-content ul {

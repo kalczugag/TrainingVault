@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import updateLocale from "dayjs/plugin/updateLocale";
+import isoWeek from "dayjs/plugin/isoWeek";
 import "dayjs/locale/pl";
 import enGB from "antd/es/locale/pl_PL";
 import duration from "dayjs/plugin/duration";
@@ -18,8 +19,10 @@ import {
 } from "antd";
 import { Flex, type CalendarProps } from "antd";
 import ActivityModal from "@/components/ActivityModal";
+import { current } from "@reduxjs/toolkit";
 
 dayjs.extend(duration);
+dayjs.extend(isoWeek);
 dayjs.extend(updateLocale);
 dayjs.updateLocale("en", {
     weekstart: 1,
@@ -27,6 +30,7 @@ dayjs.updateLocale("en", {
 
 const CalendarModule = () => {
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+    const [currentDate, setCurrentDate] = useState(() => dayjs());
 
     const { data } = useGetActivitiesQuery({});
 
@@ -67,12 +71,63 @@ const CalendarModule = () => {
         return info.originNode;
     };
 
+    const getWeeklyStatsForMonth = () => {
+        const weeks = [];
+        let currentIter = currentDate.startOf("month").startOf("isoWeek");
+        const endOfMonth = currentDate.endOf("month").endOf("isoWeek");
+
+        while (currentIter.isBefore(endOfMonth)) {
+            const weekStart = currentIter.valueOf();
+            const weekEnd = currentIter.endOf("isoWeek").valueOf();
+
+            const acts =
+                data?.result?.filter((a) => {
+                    const t = dayjs(a.startTime).valueOf();
+                    return t >= weekStart && t <= weekEnd;
+                }) || [];
+
+            const totalTss = acts.reduce(
+                (sum, act) => sum + (act.summary?.tss || 0),
+                0,
+            );
+            const totalDistance = acts.reduce(
+                (sum, act) => sum + (act.distanceMeters || 0),
+                0,
+            );
+            const totalDuration = acts.reduce(
+                (sum, act) => sum + (act.durationSec || 0),
+                0,
+            );
+            const totalHours = Math.floor(totalDuration / 3600);
+            const totalMins = Math.floor((totalDuration % 3600) / 60)
+                .toString()
+                .padStart(2, "0");
+
+            weeks.push({
+                id: weekStart,
+                label: `${currentIter.format("DD MMM")} - ${currentIter.endOf("isoWeek").format("DD MMM")}`,
+                tss: totalTss,
+                distance: (totalDistance / 1000).toFixed(1),
+                time: `${totalHours}:${totalMins} h`,
+                count: acts.length,
+            });
+
+            currentIter = currentIter.add(1, "week");
+        }
+        return weeks;
+    };
+
+    const weeklyStats = getWeeklyStatsForMonth();
+
     return (
         <ConfigProvider locale={enGB}>
-            <div className="overflow-x-auto w-full pb-4">
-                <div className="min-w-225">
+            <div className="flex flex-row items-start gap-6 overflow-x-auto w-full">
+                <div className="flex-1 min-w-225">
                     <Calendar
                         style={{ minWidth: "900px", marginTop: "40px" }}
+                        value={currentDate}
+                        onChange={(date) => setCurrentDate(date)}
+                        onPanelChange={(date) => setCurrentDate(date)}
                         cellRender={cellRender}
                         headerRender={({ value, onChange }) => (
                             <div className="fixed bg-white top-10 left-0 right-0 z-50 shadow">
@@ -194,18 +249,72 @@ const CalendarModule = () => {
                                     </Space>
                                 </div>
                                 <div className="flex w-full border-y border-gray-200 min-w-225">
-                                    {getDaysOfWeek().map((day) => (
-                                        <div
-                                            key={day}
-                                            className="flex-1 p-2 px-6 pr-4 text-gray-400 font-medium text-xs uppercase tracking-wider"
-                                        >
-                                            {day}
-                                        </div>
-                                    ))}
+                                    {[...getDaysOfWeek(), "Summary"].map(
+                                        (day) => (
+                                            <div
+                                                key={day}
+                                                className="flex-1 p-2 px-6 pr-4 text-gray-400 font-medium text-xs uppercase tracking-wider"
+                                            >
+                                                {day}
+                                            </div>
+                                        ),
+                                    )}
                                 </div>
                             </div>
                         )}
                     />
+                </div>
+                <div className="w-[320px] shrink-0">
+                    <Card
+                        title={`Summary: ${currentDate.format("MMMM")}`}
+                        className="shadow-sm sticky top-22.5"
+                    >
+                        <Flex vertical gap="large">
+                            {weeklyStats.map((week, index) => (
+                                <div
+                                    key={week.id}
+                                    className="border-b border-gray-100 pb-3 last:border-0 last:pb-0"
+                                >
+                                    <div className="text-xs text-blue-500 font-bold mb-2">
+                                        Week {index + 1}{" "}
+                                        <span className="text-gray-400 font-normal">
+                                            ({week.label})
+                                        </span>
+                                    </div>
+
+                                    {week.count > 0 ? (
+                                        <Flex
+                                            justify="space-between"
+                                            className="text-sm font-medium text-gray-700"
+                                        >
+                                            <Flex vertical>
+                                                <span className="text-xs text-gray-400">
+                                                    Time
+                                                </span>
+                                                {week.time}
+                                            </Flex>
+                                            <Flex vertical>
+                                                <span className="text-xs text-gray-400">
+                                                    Distance
+                                                </span>
+                                                {week.distance} km
+                                            </Flex>
+                                            <Flex vertical>
+                                                <span className="text-xs text-gray-400">
+                                                    TSS
+                                                </span>
+                                                {week.tss}
+                                            </Flex>
+                                        </Flex>
+                                    ) : (
+                                        <div className="text-xs text-gray-300 italic">
+                                            No Activities
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </Flex>
+                    </Card>
                 </div>
             </div>
         </ConfigProvider>
