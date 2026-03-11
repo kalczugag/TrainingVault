@@ -27,9 +27,9 @@ import type { UserState } from "@/store/auth/authSlice";
 const { Header } = Layout;
 
 const navItems: MenuProps["items"] = [
-    { key: "home", label: "Home" },
-    { key: "calendar", label: "Calendar" },
-    { key: "dashboard", label: "Dashboard" },
+    { key: "/", label: "Home" },
+    { key: "/calendar", label: "Calendar" },
+    { key: "/dashboard", label: "Dashboard" },
 ];
 
 const ProfileDropdown = ({
@@ -73,8 +73,6 @@ const HeaderContent = () => {
     const [isFullscreen, setIsFullscreen] = useState(false);
     const { user } = useAuth();
     const [logout] = useLogoutMutation();
-
-    const currentLocation = location.pathname.split("/").pop();
 
     const toggleFullscreen = () => {
         if (!document.fullscreenElement) {
@@ -188,10 +186,8 @@ const HeaderContent = () => {
                 <Menu
                     theme="dark"
                     mode="horizontal"
-                    defaultSelectedKeys={
-                        currentLocation ? [currentLocation] : ["home"]
-                    }
-                    onSelect={({ key }) => navigate(key === "home" ? "/" : key)}
+                    selectedKeys={[location.pathname]}
+                    onClick={(info) => navigate(info.key)}
                     items={navItems}
                     style={{
                         flex: 1,

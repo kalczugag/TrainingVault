@@ -23,9 +23,14 @@ interface ActivityModalProps {
     item: Activity;
 }
 
+export type pageType = "1" | "2" | "3" | "4" | "5";
+
 const ActivityModal = ({ item }: ActivityModalProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
+    const [page, setPage] = useState<pageType>("1");
+
+    const handlePageChange = (key: pageType) => setPage(key);
 
     const showModal = () => {
         setIsFullscreen(false);
@@ -134,7 +139,7 @@ const ActivityModal = ({ item }: ActivityModalProps) => {
                 )}
             >
                 <Layout hasSider style={{ backgroundColor: "#FFF" }}>
-                    <SideMenu />
+                    <SideMenu handlePageChange={handlePageChange} />
                     <Content style={{ padding: "2px", paddingLeft: "4px" }}>
                         {item.title}
                     </Content>

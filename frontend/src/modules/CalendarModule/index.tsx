@@ -121,8 +121,8 @@ const CalendarModule = () => {
 
     return (
         <ConfigProvider locale={enGB}>
-            <div className="flex flex-row items-start gap-6 overflow-x-auto w-full">
-                <div className="flex-1 min-w-225">
+            <div className=" relative flex flex-row gap-6 w-full">
+                <div className="flex-1 min-w-225 overflow-x-auto">
                     <Calendar
                         style={{ minWidth: "900px", marginTop: "40px" }}
                         value={currentDate}
@@ -267,7 +267,11 @@ const CalendarModule = () => {
                 <div className="w-[320px] shrink-0">
                     <Card
                         title={`Summary: ${currentDate.format("MMMM")}`}
-                        className="shadow-sm sticky top-22.5"
+                        style={{
+                            position: "sticky",
+                            top: "150px",
+                        }}
+                        className="shadow-sm"
                     >
                         <Flex vertical gap="large">
                             {weeklyStats.map((week, index) => (
