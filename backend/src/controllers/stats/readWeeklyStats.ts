@@ -17,7 +17,7 @@ export const readWeeklyStats = async (
 
         const [weeklyStats, totalCount] = await Promise.all([
             WeeklyStatModel.find({ athleteId: userId })
-                .sort({ startTime: -1 })
+                .sort({ weekStartDate: -1 })
                 .skip(skip)
                 .limit(limit)
                 .lean(),
