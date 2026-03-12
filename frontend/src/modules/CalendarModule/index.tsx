@@ -19,7 +19,7 @@ import {
 } from "antd";
 import { Flex, type CalendarProps } from "antd";
 import ActivityModal from "@/components/ActivityModal";
-import { current } from "@reduxjs/toolkit";
+import type { Activity } from "@/types/Activity";
 
 dayjs.extend(duration);
 dayjs.extend(isoWeek);
@@ -28,11 +28,14 @@ dayjs.updateLocale("en", {
     weekstart: 1,
 });
 
-const CalendarModule = () => {
+interface CalendarModuleProps {
+    activities: Activity[];
+    isLoading: boolean;
+}
+
+const CalendarModule = ({ activities, isLoading }: CalendarModuleProps) => {
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
     const [currentDate, setCurrentDate] = useState(() => dayjs());
-
-    const { data } = useGetActivitiesQuery({});
 
     const getDaysOfWeek = () => {
         const days = [];
@@ -43,7 +46,7 @@ const CalendarModule = () => {
     };
 
     const getListData = (value: Dayjs) => {
-        const activitiesForThisDay = data?.result.filter((activity) =>
+        const activitiesForThisDay = activities.filter((activity) =>
             dayjs(activity.startTime).isSame(value, "day"),
         );
         return activitiesForThisDay;
@@ -81,7 +84,7 @@ const CalendarModule = () => {
             const weekEnd = currentIter.endOf("isoWeek").valueOf();
 
             const acts =
-                data?.result?.filter((a) => {
+                activities.filter((a) => {
                     const t = dayjs(a.startTime).valueOf();
                     return t >= weekStart && t <= weekEnd;
                 }) || [];

@@ -18,6 +18,7 @@ import type { Activity } from "@/types/Activity";
 import ActivityCard from "./ActivityCard";
 import { Content } from "antd/es/layout/layout";
 import SideMenu from "./SideMenu";
+import ActivityModalContent from "./ActivityModalContent";
 
 interface ActivityModalProps {
     item: Activity;
@@ -66,7 +67,10 @@ const ActivityModal = ({ item }: ActivityModalProps) => {
             <Modal
                 closable={false}
                 width={"100%"}
-                style={{ maxWidth: isFullscreen ? "100%" : "700px" }}
+                centered
+                style={{
+                    maxWidth: isFullscreen ? "100%" : "700px",
+                }}
                 title={
                     <Flex
                         justify="space-between"
@@ -140,8 +144,14 @@ const ActivityModal = ({ item }: ActivityModalProps) => {
             >
                 <Layout hasSider style={{ backgroundColor: "#FFF" }}>
                     <SideMenu handlePageChange={handlePageChange} />
-                    <Content style={{ padding: "2px", paddingLeft: "4px" }}>
-                        {item.title}
+                    <Content
+                        style={{
+                            padding: "10px",
+                            height: "60vh",
+                            overflow: "auto",
+                        }}
+                    >
+                        <ActivityModalContent item={item} />
                     </Content>
                 </Layout>
             </Modal>
