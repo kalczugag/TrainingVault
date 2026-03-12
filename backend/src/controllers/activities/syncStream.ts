@@ -23,14 +23,19 @@ export const fetchAndSaveActivityStream = async (
         const { garminActivityId } = req.body;
         const userId = (req.user as User)._id;
 
-        const streamExists = await ActivityStreamModel.exists({
+        const streamExists = await ActivityStreamModel.find({
             "metadata.activityId": dbActivityId,
-        });
+        }).sort({ timestamp: 1 });
 
-        if (streamExists) {
+        if (streamExists && streamExists.length > 0) {
             return res
-                .status(400)
-                .json(errorResponse(null, "Stream already exists"));
+                .status(200)
+                .json(
+                    successResponse(
+                        streamExists,
+                        "Stream fetched from database",
+                    ),
+                );
         }
 
         const user = await UserModel.findById(userId)
@@ -128,14 +133,25 @@ export const fetchAndSaveActivityStream = async (
                 }),
             );
 
-            await ActivityModel.findByIdAndUpdate(dbActivityId, {
-                $set: { laps: lapsToInsert },
-            });
+            await ActivityModel.findByIdAndUpdate(
+                dbActivityId,
+                {
+                    $set: { laps: lapsToInsert },
+                },
+                { new: true },
+            );
         }
 
         fs.unlinkSync(zipFilePath);
 
-        return res.status(200).json(successResponse(null));
+        return res
+            .status(200)
+            .json(
+                successResponse(
+                    streamDataToInsert,
+                    "Stream synchronized successfully",
+                ),
+            );
     } catch (err: any) {
         console.error(err.message);
         return res
