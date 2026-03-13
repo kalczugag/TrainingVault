@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import updateLocale from "dayjs/plugin/updateLocale";
@@ -6,8 +6,18 @@ import isoWeek from "dayjs/plugin/isoWeek";
 import "dayjs/locale/pl";
 import enGB from "antd/es/locale/pl_PL";
 import duration from "dayjs/plugin/duration";
-import { useGetActivitiesQuery } from "@/store";
-import { DownOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
+import {
+    DownOutlined,
+    LeftOutlined,
+    RightOutlined,
+    MenuOutlined,
+    DeleteOutlined,
+    PlusOutlined,
+    ScissorOutlined,
+    CopyOutlined,
+    SnippetsOutlined,
+    SplitCellsOutlined,
+} from "@ant-design/icons";
 import {
     Button,
     Calendar,
@@ -16,10 +26,13 @@ import {
     Card,
     ConfigProvider,
     Tooltip,
+    Flex,
+    Dropdown,
 } from "antd";
-import { Flex, type CalendarProps } from "antd";
+import type { CalendarProps, MenuProps } from "antd";
 import ActivityModal from "@/components/ActivityModal";
 import type { Activity } from "@/types/Activity";
+import type { WeeklyStat } from "@/types/WeeklyStat";
 
 dayjs.extend(duration);
 dayjs.extend(isoWeek);
@@ -30,10 +43,15 @@ dayjs.updateLocale("en", {
 
 interface CalendarModuleProps {
     activities: Activity[];
+    weeklyStats: WeeklyStat[];
     isLoading: boolean;
 }
 
-const CalendarModule = ({ activities, isLoading }: CalendarModuleProps) => {
+const CalendarModule = ({
+    activities,
+    weeklyStats,
+    isLoading,
+}: CalendarModuleProps) => {
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
     const [currentDate, setCurrentDate] = useState(() => dayjs());
 
@@ -53,16 +71,141 @@ const CalendarModule = ({ activities, isLoading }: CalendarModuleProps) => {
     };
 
     const dateCellRender = (value: Dayjs) => {
+        const [selected, setSelected] = useState<Dayjs | null>(null);
         const listData = getListData(value);
 
-        if (listData?.length === 0) return null;
+        const isActualWeek = value.isSame(dayjs(), "isoWeek");
+        const isToday = value.isSame(dayjs(), "day");
 
+        const items: MenuProps["items"] = [
+            {
+                key: "1",
+                label: "Add",
+                icon: <PlusOutlined />,
+                onClick: () => {
+                    alert("clicked 1");
+                },
+            },
+            {
+                key: "2",
+                label: "Cut",
+                icon: <ScissorOutlined />,
+                onClick: () => {
+                    alert("clicked 2");
+                },
+            },
+            {
+                key: "3",
+                label: "Copy",
+                icon: <CopyOutlined />,
+                onClick: () => {
+                    alert("clicked 3");
+                },
+            },
+            {
+                key: "4",
+                label: "Paste",
+                icon: <SnippetsOutlined />,
+                onClick: () => {
+                    alert("clicked 4");
+                },
+            },
+            {
+                key: "5",
+                label: "Shift",
+                icon: <SplitCellsOutlined />,
+                onClick: () => {
+                    alert("clicked 5");
+                },
+            },
+            {
+                type: "divider",
+            },
+            {
+                key: "6",
+                label: "Delete",
+                icon: <DeleteOutlined />,
+                danger: true,
+                onClick: () => {
+                    alert("clicked 6");
+                },
+            },
+        ];
+
+        //backdrop #BED3FD
         return (
-            <ul>
-                {listData?.map((item) => (
-                    <ActivityModal key={item._id} item={item} />
-                ))}
-            </ul>
+            <div className="relative">
+                {selected && (
+                    <div
+                        className="absolute inset-0 z-50 bg-[#BED3FD] w-full h-full opacity-50"
+                        onClick={() => setSelected(null)}
+                    />
+                )}
+                <Card
+                    size="small"
+                    title={value.format("DD")}
+                    className="group cursor-default"
+                    extra={
+                        <div className="opacity-0  group-hover:opacity-100 transition-opacity duration-200">
+                            <Dropdown trigger={["click"]} menu={{ items }}>
+                                <Button
+                                    icon={<MenuOutlined />}
+                                    size="small"
+                                    type="text"
+                                />
+                            </Dropdown>
+                        </div>
+                    }
+                    styles={{
+                        root: {
+                            backgroundColor: "#FFF",
+                            textAlign: "left",
+                            border: "none",
+                            borderTop: "1px groove",
+                            borderRight: "1px groove",
+                            borderRadius: 0,
+                            display: "flex",
+                            flexDirection: "column",
+                            height: "100%",
+                        },
+                        header: {
+                            background:
+                                isActualWeek && isToday
+                                    ? "#1840EC"
+                                    : isActualWeek
+                                      ? "#EAECF2"
+                                      : "transparent",
+                            color: isActualWeek && isToday ? "#FFF" : "#061a5a",
+                            fontWeight: 300,
+                            fontSize: "12px",
+                            borderRadius: 0,
+                            border: "none",
+                            minHeight: "unset",
+                        },
+                        body: {
+                            borderRadius: 0,
+                            border: "none",
+                            padding: "8px",
+                            flex: 1,
+                            minHeight: "100px",
+                        },
+                    }}
+                >
+                    <ul className="group">
+                        {listData?.map((item) => (
+                            <ActivityModal key={item._id} item={item} />
+                        ))}
+                        <Button
+                            type="text"
+                            color="default"
+                            variant="outlined"
+                            className="w-full opacity-0  group-hover:opacity-100 transition-opacity duration-200"
+                        >
+                            <PlusOutlined />
+                        </Button>
+                    </ul>
+                </Card>
+            </div>
         );
     };
 
@@ -74,54 +217,6 @@ const CalendarModule = ({ activities, isLoading }: CalendarModuleProps) => {
         return info.originNode;
     };
 
-    const getWeeklyStatsForMonth = () => {
-        const weeks = [];
-        let currentIter = currentDate.startOf("month").startOf("isoWeek");
-        const endOfMonth = currentDate.endOf("month").endOf("isoWeek");
-
-        while (currentIter.isBefore(endOfMonth)) {
-            const weekStart = currentIter.valueOf();
-            const weekEnd = currentIter.endOf("isoWeek").valueOf();
-
-            const acts =
-                activities.filter((a) => {
-                    const t = dayjs(a.startTime).valueOf();
-                    return t >= weekStart && t <= weekEnd;
-                }) || [];
-
-            const totalTss = acts.reduce(
-                (sum, act) => sum + (act.summary?.tss || 0),
-                0,
-            );
-            const totalDistance = acts.reduce(
-                (sum, act) => sum + (act.distanceMeters || 0),
-                0,
-            );
-            const totalDuration = acts.reduce(
-                (sum, act) => sum + (act.durationSec || 0),
-                0,
-            );
-            const totalHours = Math.floor(totalDuration / 3600);
-            const totalMins = Math.floor((totalDuration % 3600) / 60)
-                .toString()
-                .padStart(2, "0");
-
-            weeks.push({
-                id: weekStart,
-                label: `${currentIter.format("DD MMM")} - ${currentIter.endOf("isoWeek").format("DD MMM")}`,
-                tss: totalTss,
-                distance: (totalDistance / 1000).toFixed(1),
-                time: `${totalHours}:${totalMins} h`,
-                count: acts.length,
-            });
-
-            currentIter = currentIter.add(1, "week");
-        }
-        return weeks;
-    };
-
-    const weeklyStats = getWeeklyStatsForMonth();
-
     return (
         <ConfigProvider locale={enGB}>
             <div className=" relative flex flex-row gap-6 w-full">
@@ -131,7 +226,7 @@ const CalendarModule = ({ activities, isLoading }: CalendarModuleProps) => {
                         value={currentDate}
                         onChange={(date) => setCurrentDate(date)}
                         onPanelChange={(date) => setCurrentDate(date)}
-                        cellRender={cellRender}
+                        fullCellRender={cellRender}
                         headerRender={({ value, onChange }) => (
                             <div className="fixed bg-white top-10 left-0 right-0 z-50 shadow">
                                 <div className="h-16 flex items-center p-6">
@@ -267,6 +362,8 @@ const CalendarModule = ({ activities, isLoading }: CalendarModuleProps) => {
                         )}
                     />
                 </div>
+
+                {/* Weekly stats design to change  */}
                 <div className="w-[320px] shrink-0">
                     <Card
                         title={`Summary: ${currentDate.format("MMMM")}`}
@@ -277,19 +374,27 @@ const CalendarModule = ({ activities, isLoading }: CalendarModuleProps) => {
                         className="shadow-sm"
                     >
                         <Flex vertical gap="large">
-                            {weeklyStats.map((week, index) => (
+                            {weeklyStats.map((stat, index) => (
                                 <div
-                                    key={week.id}
+                                    key={stat._id}
                                     className="border-b border-gray-100 pb-3 last:border-0 last:pb-0"
                                 >
                                     <div className="text-xs text-blue-500 font-bold mb-2">
                                         Week {index + 1}{" "}
                                         <span className="text-gray-400 font-normal">
-                                            ({week.label})
+                                            (
+                                            {dayjs(
+                                                stat.weekStartDate.toString(),
+                                            ).format("DD MMMM")}{" "}
+                                            -{" "}
+                                            {dayjs(
+                                                stat.weekEndDate.toString(),
+                                            ).format("DD MMMM")}
+                                            )
                                         </span>
                                     </div>
 
-                                    {week.count > 0 ? (
+                                    {stat.activityCount > 0 ? (
                                         <Flex
                                             justify="space-between"
                                             className="text-sm font-medium text-gray-700"
@@ -298,19 +403,29 @@ const CalendarModule = ({ activities, isLoading }: CalendarModuleProps) => {
                                                 <span className="text-xs text-gray-400">
                                                     Time
                                                 </span>
-                                                {week.time}
+                                                {`${Math.floor(stat.totalDurationSec / 3600)}:${Math.floor(
+                                                    (stat.totalDurationSec %
+                                                        3600) /
+                                                        60,
+                                                )
+                                                    .toString()
+                                                    .padStart(2, "0")} hms`}
                                             </Flex>
                                             <Flex vertical>
                                                 <span className="text-xs text-gray-400">
                                                     Distance
                                                 </span>
-                                                {week.distance} km
+                                                {(
+                                                    stat.totalDistanceMeters /
+                                                    1000
+                                                ).toFixed(2)}{" "}
+                                                km
                                             </Flex>
                                             <Flex vertical>
                                                 <span className="text-xs text-gray-400">
                                                     TSS
                                                 </span>
-                                                {week.tss}
+                                                {stat.totalTss}
                                             </Flex>
                                         </Flex>
                                     ) : (
