@@ -10,7 +10,10 @@ interface ActivityCardProps {
 
 const ActivityCard = ({ item, showModal }: ActivityCardProps) => {
     return (
-        <li onClick={showModal} style={{ marginBottom: "8px" }}>
+        <li
+            onClick={showModal}
+            style={{ marginBottom: "8px", cursor: "pointer" }}
+        >
             <Card size="small">
                 <Card.Meta
                     title={

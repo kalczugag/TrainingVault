@@ -52,6 +52,7 @@ const CalendarModule = ({
     weeklyStats,
     isLoading,
 }: CalendarModuleProps) => {
+    const [selectedDate, setSelectedDate] = useState<string | null>(null);
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
     const [currentDate, setCurrentDate] = useState(() => dayjs());
 
@@ -71,11 +72,15 @@ const CalendarModule = ({
     };
 
     const dateCellRender = (value: Dayjs) => {
-        const [selected, setSelected] = useState<Dayjs | null>(null);
         const listData = getListData(value);
 
+        const currentDate = value.format("YYYY-MM-DD");
+
+        const isActualMonth = value.isSame(dayjs(), "month");
         const isActualWeek = value.isSame(dayjs(), "isoWeek");
         const isToday = value.isSame(dayjs(), "day");
+
+        const isSelected = selectedDate === currentDate;
 
         const items: MenuProps["items"] = [
             {
@@ -106,6 +111,7 @@ const CalendarModule = ({
                 key: "4",
                 label: "Paste",
                 icon: <SnippetsOutlined />,
+                disabled: true,
                 onClick: () => {
                     alert("clicked 4");
                 },
@@ -134,22 +140,44 @@ const CalendarModule = ({
 
         //backdrop #BED3FD
         return (
-            <div className="relative">
-                {selected && (
+            <div className="relative h-full">
+                {isSelected && (
                     <div
-                        className="absolute inset-0 z-50 bg-[#BED3FD] w-full h-full opacity-50"
-                        onClick={() => setSelected(null)}
+                        className="absolute inset-0 z-1 bg-[#9dbeff] w-full h-full opacity-50"
+                        onClick={() => setSelectedDate(null)}
                     />
                 )}
                 <Card
                     size="small"
-                    title={value.format("DD")}
+                    title={
+                        <div
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedDate(
+                                    isSelected ? null : currentDate,
+                                );
+                            }}
+                        >
+                            {isToday && "Today"} {value.format("DD")}
+                        </div>
+                    }
                     className="group cursor-default"
                     extra={
-                        <div className="opacity-0  group-hover:opacity-100 transition-opacity duration-200">
+                        <div
+                            className="opacity-0  group-hover:opacity-100 transition-opacity duration-200"
+                            onClick={(e) => e.stopPropagation()}
+                        >
                             <Dropdown trigger={["click"]} menu={{ items }}>
                                 <Button
-                                    icon={<MenuOutlined />}
+                                    icon={
+                                        <MenuOutlined
+                                            style={{
+                                                color: isToday
+                                                    ? "#FFF"
+                                                    : undefined,
+                                            }}
+                                        />
+                                    }
                                     size="small"
                                     type="text"
                                 />
@@ -175,7 +203,12 @@ const CalendarModule = ({
                                     : isActualWeek
                                       ? "#EAECF2"
                                       : "transparent",
-                            color: isActualWeek && isToday ? "#FFF" : "#061a5a",
+                            color:
+                                isActualWeek && isToday
+                                    ? "#FFF"
+                                    : isActualMonth
+                                      ? "#061a5a"
+                                      : "#C3C9D7",
                             fontWeight: 300,
                             fontSize: "12px",
                             borderRadius: 0,
@@ -222,7 +255,7 @@ const CalendarModule = ({
             <div className=" relative flex flex-row gap-6 w-full">
                 <div className="flex-1 min-w-225 overflow-x-auto">
                     <Calendar
-                        style={{ minWidth: "900px", marginTop: "40px" }}
+                        style={{ minWidth: "900px", marginTop: "41px" }}
                         value={currentDate}
                         onChange={(date) => setCurrentDate(date)}
                         onPanelChange={(date) => setCurrentDate(date)}
@@ -304,9 +337,10 @@ const CalendarModule = ({
                                         >
                                             <Button
                                                 variant="outlined"
-                                                onClick={() =>
-                                                    onChange(dayjs())
-                                                }
+                                                onClick={() => {
+                                                    setSelectedDate(null);
+                                                    onChange(dayjs());
+                                                }}
                                             >
                                                 Today
                                             </Button>
@@ -317,7 +351,8 @@ const CalendarModule = ({
                                         >
                                             <Button
                                                 icon={<LeftOutlined />}
-                                                onClick={() =>
+                                                onClick={() => {
+                                                    setSelectedDate(null);
                                                     onChange(
                                                         value
                                                             .clone()
@@ -325,8 +360,8 @@ const CalendarModule = ({
                                                                 1,
                                                                 "month",
                                                             ),
-                                                    )
-                                                }
+                                                    );
+                                                }}
                                             />
                                         </Tooltip>
                                         <Tooltip
