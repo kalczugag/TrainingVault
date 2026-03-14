@@ -7,18 +7,19 @@ import {
     Layout,
     Modal,
     Space,
+    Tooltip,
 } from "antd";
 import {
     ShrinkOutlined,
     ArrowsAltOutlined,
     CloseOutlined,
+    FileOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import type { Activity } from "@/types/Activity";
 import ActivityCard from "./ActivityCard";
 import { Content } from "antd/es/layout/layout";
 import SideMenu from "./SideMenu";
-import ActivityModalContent from "./ActivityModalContent";
 
 interface ActivityModalProps {
     item: Activity;
@@ -71,16 +72,33 @@ const ActivityModal = ({ item }: ActivityModalProps) => {
                 style={{
                     maxWidth: isFullscreen ? "100%" : "700px",
                 }}
+                styles={{ root: { padding: 0 } }}
                 title={
-                    <Flex
-                        justify="space-between"
-                        align="start"
-                        style={{ width: "100%" }}
-                    >
-                        <Space vertical>
+                    <Flex vertical gap={8} style={{ width: "100%" }}>
+                        <Flex align="center" justify="space-between">
                             <span className="text-blue-500 text-sm font-medium">
                                 {activityDate} - {activityHour}
                             </span>
+                            <Space size={0}>
+                                <Button
+                                    type="text"
+                                    onClick={toggleFullscreen}
+                                    icon={
+                                        isFullscreen ? (
+                                            <ShrinkOutlined />
+                                        ) : (
+                                            <ArrowsAltOutlined />
+                                        )
+                                    }
+                                />
+                                <Button
+                                    type="text"
+                                    onClick={toggleFullscreen}
+                                    icon={<CloseOutlined />}
+                                />
+                            </Space>
+                        </Flex>
+                        <Flex gap={8} align="start">
                             <Descriptions
                                 style={{
                                     backgroundColor: "#F1F3F7",
@@ -101,25 +119,23 @@ const ActivityModal = ({ item }: ActivityModalProps) => {
                                     {item.summary.tss}
                                 </Descriptions.Item>
                             </Descriptions>
-                        </Space>
-                        <Space>
-                            <Button
-                                type="text"
-                                onClick={toggleFullscreen}
-                                icon={
-                                    isFullscreen ? (
-                                        <ShrinkOutlined />
-                                    ) : (
-                                        <ArrowsAltOutlined />
-                                    )
-                                }
-                            />
-                            <Button
-                                type="text"
-                                onClick={toggleFullscreen}
-                                icon={<CloseOutlined />}
-                            />
-                        </Space>
+                            <Flex vertical justify="space-between" gap={8}>
+                                <Tooltip
+                                    title="Upload/download/delete files or recalculate workout statistics."
+                                    placement="bottom"
+                                >
+                                    <Button icon={<FileOutlined />}>
+                                        Files
+                                    </Button>
+                                </Tooltip>
+                                <Button
+                                    type="primary"
+                                    onClick={toggleFullscreen}
+                                >
+                                    Analyze
+                                </Button>
+                            </Flex>
+                        </Flex>
                     </Flex>
                 }
                 open={isModalOpen}
@@ -143,15 +159,17 @@ const ActivityModal = ({ item }: ActivityModalProps) => {
                 )}
             >
                 <Layout hasSider style={{ backgroundColor: "#FFF" }}>
-                    <SideMenu handlePageChange={handlePageChange} />
                     <Content
                         style={{
-                            padding: "10px",
                             height: "60vh",
                             overflow: "auto",
                         }}
                     >
-                        <ActivityModalContent item={item} />
+                        <SideMenu
+                            handlePageChange={handlePageChange}
+                            item={item}
+                        />
+                        {/* <ActivityModalContent item={item} /> */}
                     </Content>
                 </Layout>
             </Modal>

@@ -1,7 +1,8 @@
-import React from "react";
-import { Col, Flex, Input, Row } from "antd";
+import { Col, Flex, Form, Input, Row } from "antd";
 import dayjs from "dayjs";
 import type { Activity } from "@/types/Activity";
+
+const { TextArea } = Input;
 
 interface ActivityModalContentProps {
     item: Activity;
@@ -19,7 +20,7 @@ interface StatsProps {
 
 const SummaryTableItem = ({ stats, header }: StatsProps) => {
     return (
-        <div>
+        <div className="flex-1">
             <Row gutter={12} align="middle" style={{ marginBottom: "8px" }}>
                 <Col span={8}></Col>
                 {header.map((label, index) => (
@@ -89,7 +90,7 @@ const SummaryTableItem = ({ stats, header }: StatsProps) => {
     );
 };
 
-const ActivityModalContent = ({ item }: ActivityModalContentProps) => {
+const SummaryTab = ({ item }: ActivityModalContentProps) => {
     const summaryStats: StatsProps["stats"] = [
         {
             label: "Duration",
@@ -123,14 +124,18 @@ const ActivityModalContent = ({ item }: ActivityModalContentProps) => {
     ];
 
     return (
-        <Flex vertical gap={30} style={{ maxWidth: "420px", margin: "16px 0" }}>
+        <Flex gap={40} style={{ margin: "16px 0" }}>
             <SummaryTableItem
                 stats={summaryStats}
                 header={["Planned", "Completed"]}
             />
-            {/* <SummaryTableItem stats={stats} header={["Avg", "Max"]} /> */}
+            <Form name="summary" layout="vertical" style={{ flex: 0.7 }}>
+                <Form.Item name="description" label="Description">
+                    <TextArea variant="filled" autoSize />
+                </Form.Item>
+            </Form>
         </Flex>
     );
 };
 
-export default ActivityModalContent;
+export default SummaryTab;
