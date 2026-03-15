@@ -8,101 +8,66 @@ import {
 import { Button, Tabs, Tooltip } from "antd";
 import SummaryTab from "../tabs/SummaryTab";
 import type { Activity } from "@/types/Activity";
+import { useState } from "react";
 
 interface SideMenuProps {
     item: Activity;
 }
 
 const SideNavigation = ({ item }: SideMenuProps) => {
+    const [activeTab, setActiveTab] = useState("1");
+
+    const tabConfigs = [
+        {
+            key: "1",
+            title: "Summary",
+            icon: <FileFilled />,
+            content: <SummaryTab item={item} />,
+        },
+        {
+            key: "2",
+            title: "Map and Graph",
+            icon: <FundFilled />,
+            content: <div>Mapa</div>,
+        },
+        {
+            key: "3",
+            title: "Heart Rate",
+            icon: <HeartFilled />,
+            content: <div>Tętno</div>,
+        },
+        {
+            key: "4",
+            title: "Power",
+            icon: <ThunderboltFilled />,
+            content: <div>Moc</div>,
+        },
+        {
+            key: "5",
+            title: "Speed",
+            icon: <ClockCircleFilled />,
+            content: <div>Prędkość</div>,
+        },
+    ];
+
+    const tabItems = tabConfigs.map((tab) => ({
+        key: tab.key,
+        label: (
+            <Tooltip title={tab.title} placement="right">
+                <Button type={activeTab === tab.key ? "link" : "text"}>
+                    {tab.icon}
+                </Button>
+            </Tooltip>
+        ),
+        children: tab.content,
+    }));
+
     return (
-        // <Menu
-        //     mode="inline"
-        //     defaultSelectedKeys={["1"]}
-        //     inlineCollapsed
-        //     items={[
-        //         {
-        //             key: "1",
-        //             icon: <FileFilled />,
-        //             label: "Summary",
-        //         },
-        //         {
-        //             key: "2",
-        //             icon: <FundFilled />,
-        //             label: "Map and Graph",
-        //         },
-        //         {
-        //             key: "3",
-        //             icon: <HeartFilled />,
-        //             label: "Heart Rate",
-        //         },
-        //         {
-        //             key: "4",
-        //             icon: <ThunderboltFilled />,
-        //             label: "Power",
-        //         },
-        //         {
-        //             key: "5",
-        //             icon: <ClockCircleFilled />,
-        //             label: "Speed",
-        //         },
-        //     ]}
-        // />
         <Tabs
             defaultActiveKey="1"
             tabPlacement="start"
-            items={[
-                {
-                    key: "1",
-                    label: (
-                        <Tooltip title="Summary" placement="right">
-                            <Button type="text">
-                                <FileFilled />
-                            </Button>
-                        </Tooltip>
-                    ),
-                    children: <SummaryTab item={item} />,
-                },
-                {
-                    key: "2",
-                    label: (
-                        <Tooltip title="Map and Graph" placement="right">
-                            <Button type="text">
-                                <FundFilled />
-                            </Button>
-                        </Tooltip>
-                    ),
-                },
-                {
-                    key: "3",
-                    label: (
-                        <Tooltip title="Heart Rate" placement="right">
-                            <Button type="text">
-                                <HeartFilled />
-                            </Button>
-                        </Tooltip>
-                    ),
-                },
-                {
-                    key: "4",
-                    label: (
-                        <Tooltip title="Power" placement="right">
-                            <Button type="text">
-                                <ThunderboltFilled />
-                            </Button>
-                        </Tooltip>
-                    ),
-                },
-                {
-                    key: "5",
-                    label: (
-                        <Tooltip title="Speed" placement="right">
-                            <Button type="text">
-                                <ClockCircleFilled />
-                            </Button>
-                        </Tooltip>
-                    ),
-                },
-            ]}
+            onChange={(key) => setActiveTab(key)}
+            items={tabItems}
             styles={{
                 root: {
                     height: "100%",
