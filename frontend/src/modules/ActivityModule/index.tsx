@@ -17,9 +17,10 @@ import {
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import type { Activity } from "@/types/Activity";
-import ActivityCard from "./ActivityCard";
-import { Content } from "antd/es/layout/layout";
-import SideMenu from "./SideMenu";
+import ActivityCard from "./components/ActivityCard";
+import SideNavigation from "./components/SideNavigation";
+
+const { Content } = Layout;
 
 interface ActivityModalProps {
     item: Activity;
@@ -105,6 +106,7 @@ const ActivityModal = ({ item }: ActivityModalProps) => {
                                     padding: "8px",
                                     borderRadius: "4px",
                                 }}
+                                styles={{ content: { textWrap: "nowrap" } }}
                                 title={item.title}
                             >
                                 <Descriptions.Item label="Duration">
@@ -165,10 +167,7 @@ const ActivityModal = ({ item }: ActivityModalProps) => {
                             overflow: "auto",
                         }}
                     >
-                        <SideMenu
-                            handlePageChange={handlePageChange}
-                            item={item}
-                        />
+                        <SideNavigation item={item} />
                         {/* <ActivityModalContent item={item} /> */}
                     </Content>
                 </Layout>

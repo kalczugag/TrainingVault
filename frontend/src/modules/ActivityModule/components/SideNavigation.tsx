@@ -5,17 +5,15 @@ import {
     ThunderboltFilled,
     ClockCircleFilled,
 } from "@ant-design/icons";
-import { Button, Menu, Tabs, Tooltip } from "antd";
-import type { pageType } from ".";
-import SummaryTab from "./SummaryTab";
+import { Button, Tabs, Tooltip } from "antd";
+import SummaryTab from "../tabs/SummaryTab";
 import type { Activity } from "@/types/Activity";
 
 interface SideMenuProps {
     item: Activity;
-    handlePageChange: (key: pageType) => void;
 }
 
-const SideMenu = ({ item, handlePageChange }: SideMenuProps) => {
+const SideNavigation = ({ item }: SideMenuProps) => {
     return (
         // <Menu
         //     mode="inline"
@@ -117,4 +115,4 @@ const SideMenu = ({ item, handlePageChange }: SideMenuProps) => {
     );
 };
 
-export default SideMenu;
+export default SideNavigation;
