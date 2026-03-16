@@ -1,26 +1,9 @@
-import {
-    Divider,
-    Flex,
-    Form,
-    Input,
-    Rate,
-    Select,
-    Slider,
-    Space,
-    Tooltip,
-    type RateProps,
-} from "antd";
+import { Flex, Form, Input, Rate, Select, Space } from "antd";
 import dayjs from "dayjs";
+import { SI } from "@/constants/activities";
 import type { Activity } from "@/types/Activity";
-import SummaryTable, {
-    type SummaryTableProps,
-} from "../components/SummaryTable";
-import {
-    FrownOutlined,
-    InfoCircleOutlined,
-    MehOutlined,
-    SmileOutlined,
-} from "@ant-design/icons";
+import SummaryTable, { type TableRowData } from "../components/SummaryTable";
+import { FrownOutlined, MehOutlined, SmileOutlined } from "@ant-design/icons";
 import RpeSlider from "../components/RpeSlider";
 
 const { TextArea } = Input;
@@ -30,30 +13,124 @@ interface ActivityModalContentProps {
 }
 
 const SummaryTab = ({ item }: ActivityModalContentProps) => {
-    const summaryStats: SummaryTableProps["stats"] = [
+    const summaryStatsConfig: TableRowData[] = [
         {
-            label: "Duration",
-            value: dayjs
-                .duration(item.durationSec, "seconds")
-                .format("HH:mm:ss"),
-            unit: "h:m:s",
+            key: "duration",
+            cells: [
+                { type: "text", value: "Duration" },
+                { type: "input" },
+                {
+                    type: "readonly",
+                    value: dayjs
+                        .duration(item.durationSec, "seconds")
+                        .format("HH:mm:ss"),
+                },
+                { type: "text", value: "h:m:s", unit: "true" },
+            ],
         },
         {
-            label: "Distance",
-            value: (item.distanceMeters / 1000).toFixed(1),
-            unit: "km",
+            key: "distance",
+            cells: [
+                { type: "text", value: "Distance" },
+                { type: "input" },
+                {
+                    type: "readonly",
+                    value: (item.distanceMeters / 1000).toFixed(1),
+                },
+                { type: "text", value: "km", unit: "true" },
+            ],
         },
-        { label: "Average Speed", value: item.summary.avgSpeed, unit: "kph" },
-        { label: "Calories", value: item.summary.calories, unit: "kcal" },
         {
-            label: "Elevation Gain",
-            value: item.summary.elevationGain,
-            unit: "m",
+            key: "avgSpeed",
+            cells: [
+                { type: "text", value: "Average Speed" },
+                { type: "input" },
+                {
+                    type: "readonly",
+                    value: (
+                        Math.floor(item.summary.avgSpeed * SI * 10) / 10
+                    ).toFixed(1),
+                },
+                { type: "text", value: "kph", unit: "true" },
+            ],
         },
-        { label: "TSS", value: item.summary.tss, unit: "TSS" },
-        { label: "IF", value: item.summary.if, unit: "IF" },
-        { label: "Normalized Power", value: item.summary.np, unit: "W" },
-        { label: "Work", value: item.summary.workKj, unit: "kJ" },
+        {
+            key: "calories",
+            cells: [
+                { type: "text", value: "Calories" },
+                { type: "input" },
+                { type: "readonly", value: item.summary.calories },
+                { type: "text", value: "kcal", unit: "true" },
+            ],
+        },
+        {
+            key: "elevation",
+            cells: [
+                { type: "text", value: "Elevation Gain" },
+                { type: "input" },
+                { type: "readonly", value: item.summary.elevationGain },
+                { type: "text", value: "m", unit: "true" },
+            ],
+        },
+        {
+            key: "tss",
+            cells: [
+                { type: "text", value: "TSS" },
+                { type: "input" },
+                { type: "readonly", value: item.summary.tss },
+                { type: "text", value: "TSS", unit: "true" },
+            ],
+        },
+        {
+            key: "if",
+            cells: [
+                { type: "text", value: "IF" },
+                { type: "input" },
+                { type: "readonly", value: item.summary.if },
+                { type: "text", value: "IF", unit: "true" },
+            ],
+        },
+        {
+            key: "np",
+            cells: [
+                { type: "text", value: "Normalized Power" },
+                { type: "disabled" },
+                { type: "readonly", value: item.summary.np },
+                { type: "text", value: "W", unit: "true" },
+            ],
+        },
+        {
+            key: "work",
+            cells: [
+                { type: "text", value: "Work" },
+                { type: "input" },
+                { type: "readonly", value: item.summary.workKj },
+                { type: "text", value: "kJ", unit: "true" },
+            ],
+        },
+    ];
+
+    const hrPowerConfig: TableRowData[] = [
+        {
+            key: "heart_rate",
+            cells: [
+                { type: "text", value: "Heart Rate" },
+                { type: "input" },
+                { type: "readonly", value: item.summary.avgHr },
+                { type: "readonly", value: item.summary.maxHr },
+                { type: "text", value: "bpm", unit: "true" },
+            ],
+        },
+        {
+            key: "power",
+            cells: [
+                { type: "text", value: "Power" },
+                { type: "disabled" },
+                { type: "readonly", value: item.summary.avgPower },
+                { type: "readonly", value: item.summary.maxPower },
+                { type: "text", value: "W", unit: "true" },
+            ],
+        },
     ];
 
     const customIcons: Record<number, React.ReactNode> = {
@@ -68,11 +145,16 @@ const SummaryTab = ({ item }: ActivityModalContentProps) => {
         <Flex gap={40} style={{ margin: "16px 0" }}>
             <Space style={{ flex: 1 }} size="large" vertical>
                 <SummaryTable
-                    stats={summaryStats}
                     header={["Planned", "Completed"]}
+                    rows={summaryStatsConfig}
+                />
+                <SummaryTable
+                    columnSpans={[8, 4, 5, 5, 1]}
+                    header={["Min", "Avg", "Max"]}
+                    rows={hrPowerConfig}
                 />
                 <span>Equipment</span>
-                <Form name="equipment">
+                <Form name="equipment_form">
                     <Form.Item name="equipment" label="Bike">
                         <Select
                             style={{ width: 120 }}

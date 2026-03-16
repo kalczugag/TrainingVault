@@ -26,14 +26,9 @@ interface ActivityModalProps {
     item: Activity;
 }
 
-export type pageType = "1" | "2" | "3" | "4" | "5";
-
 const ActivityModal = ({ item }: ActivityModalProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
-    const [page, setPage] = useState<pageType>("1");
-
-    const handlePageChange = (key: pageType) => setPage(key);
 
     const showModal = () => {
         setIsFullscreen(false);
@@ -164,11 +159,9 @@ const ActivityModal = ({ item }: ActivityModalProps) => {
                     <Content
                         style={{
                             height: "60vh",
-                            overflow: "auto",
                         }}
                     >
                         <SideNavigation item={item} />
-                        {/* <ActivityModalContent item={item} /> */}
                     </Content>
                 </Layout>
             </Modal>

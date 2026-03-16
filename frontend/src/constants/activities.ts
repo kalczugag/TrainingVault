@@ -37,6 +37,8 @@ export const TARGET_TYPES = [
     "none",
 ] as const;
 
+export const SI = 3.605870020964361;
+
 export type Status = (typeof STATUS)[number];
 export type SportType = (typeof SPORT_TYPES)[number];
 export type StepType = (typeof STEP_TYPES)[number];

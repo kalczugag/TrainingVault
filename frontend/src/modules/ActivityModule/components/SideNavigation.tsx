@@ -9,6 +9,7 @@ import { Button, Tabs, Tooltip } from "antd";
 import SummaryTab from "../tabs/SummaryTab";
 import type { Activity } from "@/types/Activity";
 import { useState } from "react";
+import HrTab from "../tabs/HrTab";
 
 interface SideMenuProps {
     item: Activity;
@@ -34,7 +35,7 @@ const SideNavigation = ({ item }: SideMenuProps) => {
             key: "3",
             title: "Heart Rate",
             icon: <HeartFilled />,
-            content: <div>Tętno</div>,
+            content: <HrTab item={item} />,
         },
         {
             key: "4",
@@ -74,6 +75,12 @@ const SideNavigation = ({ item }: SideMenuProps) => {
                 },
                 item: {
                     padding: 0,
+                },
+                content: {
+                    height: "100%",
+                    maxHeight: "60vh",
+                    overflowY: "auto",
+                    paddingRight: "8px",
                 },
             }}
         />

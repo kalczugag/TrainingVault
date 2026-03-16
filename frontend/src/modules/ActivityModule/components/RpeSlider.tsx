@@ -25,9 +25,15 @@ const RpeSlider = ({ value = 0, onChange }: RpeSliderProps) => {
 
     return (
         <Space style={{ width: "100%" }} vertical>
-            <Flex vertical align="center" style={{ fontSize: "12px" }}>
+            <Flex
+                vertical
+                align="center"
+                style={{ fontSize: "12px", height: "50px" }}
+            >
                 <div className="text-gray-700">{currentDescription[0]}</div>
-                <div className="text-gray-500">{currentDescription[1]}</div>
+                <div className="text-gray-500 text-center">
+                    {currentDescription[1]}
+                </div>
             </Flex>
 
             <Slider
