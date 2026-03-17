@@ -62,13 +62,13 @@ const ActivityModal = ({ item }: ActivityModalProps) => {
         <>
             <ActivityCard item={item} showModal={showModal} />
             <Modal
+                destroyOnHidden
                 closable={false}
                 width={"100%"}
                 centered
                 style={{
                     maxWidth: isFullscreen ? "100%" : "700px",
                 }}
-                styles={{ root: { padding: 0 } }}
                 title={
                     <Flex vertical gap={8} style={{ width: "100%" }}>
                         <Flex align="center" justify="space-between">
@@ -161,7 +161,10 @@ const ActivityModal = ({ item }: ActivityModalProps) => {
                             height: "60vh",
                         }}
                     >
-                        <SideNavigation item={item} />
+                        <SideNavigation
+                            item={item}
+                            isFullscreen={isFullscreen}
+                        />
                     </Content>
                 </Layout>
             </Modal>

@@ -2,7 +2,7 @@ import { Flex, Form, Input, Rate, Select, Space } from "antd";
 import dayjs from "dayjs";
 import { SI } from "@/constants/activities";
 import type { Activity } from "@/types/Activity";
-import SummaryTable, { type TableRowData } from "../components/SummaryTable";
+import SummaryTable, { type TableRowData } from "@/components/SummaryTable";
 import { FrownOutlined, MehOutlined, SmileOutlined } from "@ant-design/icons";
 import RpeSlider from "../components/RpeSlider";
 
@@ -142,7 +142,7 @@ const SummaryTab = ({ item }: ActivityModalContentProps) => {
     };
 
     return (
-        <Flex gap={40} style={{ margin: "16px 0" }}>
+        <Flex gap={40}>
             <Space style={{ flex: 1 }} size="large" vertical>
                 <SummaryTable
                     header={["Planned", "Completed"]}

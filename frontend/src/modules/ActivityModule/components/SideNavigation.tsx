@@ -6,16 +6,18 @@ import {
     ClockCircleFilled,
 } from "@ant-design/icons";
 import { Button, Tabs, Tooltip } from "antd";
-import SummaryTab from "../tabs/SummaryTab";
 import type { Activity } from "@/types/Activity";
 import { useState } from "react";
+import SummaryTab from "../tabs/SummaryTab";
 import HrTab from "../tabs/HrTab";
+import PowerTab from "../tabs/PowerTab";
 
 interface SideMenuProps {
     item: Activity;
+    isFullscreen: boolean;
 }
 
-const SideNavigation = ({ item }: SideMenuProps) => {
+const SideNavigation = ({ item, isFullscreen }: SideMenuProps) => {
     const [activeTab, setActiveTab] = useState("1");
 
     const tabConfigs = [
@@ -35,13 +37,13 @@ const SideNavigation = ({ item }: SideMenuProps) => {
             key: "3",
             title: "Heart Rate",
             icon: <HeartFilled />,
-            content: <HrTab item={item} />,
+            content: <HrTab item={item} isFullscreen={isFullscreen} />,
         },
         {
             key: "4",
             title: "Power",
             icon: <ThunderboltFilled />,
-            content: <div>Moc</div>,
+            content: <PowerTab item={item} isFullscreen={isFullscreen} />,
         },
         {
             key: "5",
@@ -80,7 +82,9 @@ const SideNavigation = ({ item }: SideMenuProps) => {
                     height: "100%",
                     maxHeight: "60vh",
                     overflowY: "auto",
+                    overflowX: "hidden",
                     paddingRight: "8px",
+                    margin: "16px 0",
                 },
             }}
         />

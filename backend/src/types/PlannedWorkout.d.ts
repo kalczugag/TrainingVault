@@ -11,15 +11,15 @@ interface WorkoutStep {
     type: StepType;
     duration: {
         type: DurationType;
-        value: number;
+        value?: number;
     };
     target: {
         type: TargetType;
-        min: number;
-        max: number;
+        min?: number;
+        max?: number;
         isRamp?: boolean;
-        startValue: number;
-        endValue: number;
+        startValue?: number;
+        endValue?: number;
     };
     steps: WorkoutStep[];
 }
