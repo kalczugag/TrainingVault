@@ -89,7 +89,7 @@ const ActivityModal = ({ item }: ActivityModalProps) => {
                                 />
                                 <Button
                                     type="text"
-                                    onClick={toggleFullscreen}
+                                    onClick={handleCancel}
                                     icon={<CloseOutlined />}
                                 />
                             </Space>
