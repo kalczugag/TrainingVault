@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import { GarminConnect } from "@flow-js/garmin-connect";
 import { decrypt } from "../utils/crypto";
 import { recalculatePMC } from "./pmcService";
@@ -7,9 +6,30 @@ import { PlannedWorkoutModel } from "../models/PlannedWorkout";
 import { UserModel } from "../models/User";
 import { UserStatModel } from "../models/UserStat";
 
-const clientsCache = new Map<string, Promise<GarminConnect>>();
+interface CachedClient {
+    client: GarminConnect;
+    lastUsed: number;
+    credentials: {
+        email: string;
+        passwordEncrypted: string;
+        iv: string;
+    };
+}
 
-export const getGarminClient = async (
+const clientsCache = new Map<string, CachedClient>();
+const pendingLogins = new Map<string, Promise<GarminConnect>>();
+
+const SESSION_TTL_MS = 60 * 60 * 1000;
+setInterval(() => {
+    const now = Date.now();
+    for (const [userId, cached] of clientsCache.entries()) {
+        if (now - cached.lastUsed > SESSION_TTL_MS) {
+            clientsCache.delete(userId);
+        }
+    }
+}, SESSION_TTL_MS);
+
+const loginUser = async (
     userId: string,
     garminCredentials: {
         email: string;
@@ -17,11 +37,11 @@ export const getGarminClient = async (
         iv: string;
     },
 ): Promise<GarminConnect> => {
-    if (clientsCache.has(userId)) {
-        return clientsCache.get(userId)!;
+    if (pendingLogins.has(userId)) {
+        return pendingLogins.get(userId)!;
     }
 
-    const connectAndLogin = async (): Promise<GarminConnect> => {
+    const loginPromise = (async () => {
         try {
             const plainPassword = decrypt(
                 garminCredentials.passwordEncrypted,
@@ -34,22 +54,78 @@ export const getGarminClient = async (
             });
 
             await newClient.login();
+
+            clientsCache.set(userId, {
+                client: newClient,
+                lastUsed: Date.now(),
+                credentials: garminCredentials,
+            });
+
             return newClient;
-        } catch (error) {
-            clientsCache.delete(userId);
-            throw error;
+        } finally {
+            pendingLogins.delete(userId);
         }
-    };
+    })();
 
-    const loginPromise = connectAndLogin();
-
-    clientsCache.set(userId, loginPromise);
-
+    pendingLogins.set(userId, loginPromise);
     return loginPromise;
+};
+
+export const getGarminClient = async (
+    userId: string,
+    garminCredentials: {
+        email: string;
+        passwordEncrypted: string;
+        iv: string;
+    },
+): Promise<GarminConnect> => {
+    const cached = clientsCache.get(userId);
+
+    if (cached) {
+        cached.lastUsed = Date.now();
+        return cached.client;
+    }
+
+    return loginUser(userId, garminCredentials);
+};
+
+export const withGarminClient = async <T>(
+    userId: string,
+    garminCredentials: {
+        email: string;
+        passwordEncrypted: string;
+        iv: string;
+    },
+    fn: (client: GarminConnect) => Promise<T>,
+): Promise<T> => {
+    const client = await getGarminClient(userId, garminCredentials);
+
+    try {
+        return await fn(client);
+    } catch (error: any) {
+        const isSessionError =
+            error?.status === 401 ||
+            error?.statusCode === 401 ||
+            error?.message?.toLowerCase().includes("session") ||
+            error?.message?.toLowerCase().includes("unauthorized") ||
+            error?.message?.toLowerCase().includes("login");
+
+        if (isSessionError) {
+            clientsCache.delete(userId);
+            const freshClient = await getGarminClient(
+                userId,
+                garminCredentials,
+            );
+            return await fn(freshClient);
+        }
+
+        throw error;
+    }
 };
 
 export const removeGarminClient = (userId: string) => {
     clientsCache.delete(userId);
+    pendingLogins.delete(userId);
 };
 
 const updateTop3 = (

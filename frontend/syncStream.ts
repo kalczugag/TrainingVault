@@ -4,7 +4,8 @@ import fs from "fs";
 import AdmZip from "adm-zip";
 import { errorResponse, successResponse } from "../../handlers/apiResponse";
 import { parseFitFile } from "../../utils/helpers";
-import { withGarminClient } from "../../config/garmin";
+import "../../config/garmin";
+import { getGarminClient } from "../../config/garmin";
 import type { User } from "../../types/User";
 import { UserModel } from "../../models/User";
 import { ActivityStreamModel } from "../../models/ActivityStream";
@@ -46,17 +47,20 @@ export const fetchAndSaveActivityStream = async (
             return res.status(404).json(errorResponse(null, "User not found"));
         }
 
+        const garminClient = await getGarminClient(
+            user._id,
+            user.garminCredentials,
+        );
+
         const downloadDir = path.resolve(__dirname, "../../files");
 
         if (!fs.existsSync(downloadDir)) {
             fs.mkdirSync(downloadDir, { recursive: true });
         }
 
-        await withGarminClient(user._id, user.garminCredentials, (client) =>
-            client.downloadOriginalActivityData(
-                { activityId: Number(garminActivityId) },
-                downloadDir,
-            ),
+        const zipBuffer = await garminClient.downloadOriginalActivityData(
+            { activityId: Number(garminActivityId) },
+            downloadDir,
         );
 
         const zipFilePath = path.join(downloadDir, `${garminActivityId}.zip`);
