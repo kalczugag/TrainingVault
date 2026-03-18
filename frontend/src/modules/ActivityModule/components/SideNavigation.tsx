@@ -11,6 +11,7 @@ import { useState } from "react";
 import SummaryTab from "../tabs/SummaryTab";
 import HrTab from "../tabs/HrTab";
 import PowerTab from "../tabs/PowerTab";
+import MapAndGraphTab from "../tabs/MapAndGraphTab";
 
 interface SideMenuProps {
     item: Activity;
@@ -31,7 +32,7 @@ const SideNavigation = ({ item, isFullscreen }: SideMenuProps) => {
             key: "2",
             title: "Map and Graph",
             icon: <FundFilled />,
-            content: <div>Mapa</div>,
+            content: <MapAndGraphTab item={item} />,
         },
         {
             key: "3",

@@ -1,5 +1,6 @@
 import { apiSlice } from "./apiSlice";
 import type { Activity } from "@/types/Activity";
+import type { ActivityStream } from "@/types/ActivityStream";
 
 export const activitiesApi = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
@@ -23,7 +24,19 @@ export const activitiesApi = apiSlice.injectEndpoints({
                 };
             },
         }),
+
+        getActivityStream: builder.query<
+            ApiResponseArray<ActivityStream>,
+            { dbActivityId: string; garminActivityId: string }
+        >({
+            query: ({ dbActivityId, garminActivityId }) => ({
+                url: `/activities/${dbActivityId}/sync-stream`,
+                method: "POST",
+                body: { garminActivityId },
+            }),
+        }),
     }),
 });
 
-export const { useGetActivitiesQuery } = activitiesApi;
+export const { useGetActivitiesQuery, useGetActivityStreamQuery } =
+    activitiesApi;
