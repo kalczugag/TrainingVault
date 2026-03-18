@@ -7,7 +7,7 @@ import { PlannedWorkoutModel } from "../models/PlannedWorkout";
 import { UserModel } from "../models/User";
 import { UserStatModel } from "../models/UserStat";
 
-const clientsCache = new Map<string, GarminConnect>();
+const clientsCache = new Map<string, Promise<GarminConnect>>();
 
 export const getGarminClient = async (
     userId: string,
@@ -21,21 +21,31 @@ export const getGarminClient = async (
         return clientsCache.get(userId)!;
     }
 
-    const plainPassword = decrypt(
-        garminCredentials.passwordEncrypted,
-        garminCredentials.iv,
-    );
+    const connectAndLogin = async (): Promise<GarminConnect> => {
+        try {
+            const plainPassword = decrypt(
+                garminCredentials.passwordEncrypted,
+                garminCredentials.iv,
+            );
 
-    const newClient = new GarminConnect({
-        username: garminCredentials.email,
-        password: plainPassword,
-    });
+            const newClient = new GarminConnect({
+                username: garminCredentials.email,
+                password: plainPassword,
+            });
 
-    await newClient.login();
+            await newClient.login();
+            return newClient;
+        } catch (error) {
+            clientsCache.delete(userId);
+            throw error;
+        }
+    };
 
-    clientsCache.set(userId, newClient);
+    const loginPromise = connectAndLogin();
 
-    return newClient;
+    clientsCache.set(userId, loginPromise);
+
+    return loginPromise;
 };
 
 export const removeGarminClient = (userId: string) => {

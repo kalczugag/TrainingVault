@@ -8,9 +8,10 @@ import type { ActivityStream } from "@/types/ActivityStream";
 
 interface MapAndGraphTabProps {
     item: Activity;
+    isFullscreen: boolean;
 }
 
-const MapAndGraphTab = ({ item }: MapAndGraphTabProps) => {
+const MapAndGraphTab = ({ item, isFullscreen }: MapAndGraphTabProps) => {
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const mapRef = useRef<mapboxgl.Map | null>(null);
 
@@ -115,7 +116,7 @@ const MapAndGraphTab = ({ item }: MapAndGraphTabProps) => {
     return (
         <div
             id="map"
-            style={{ height: "30vh", borderRadius: "8px", overflow: "hidden" }}
+            style={{ height: "275px", borderRadius: "8px", overflow: "hidden" }}
             ref={mapContainerRef}
         />
     );

@@ -32,7 +32,7 @@ const SideNavigation = ({ item, isFullscreen }: SideMenuProps) => {
             key: "2",
             title: "Map and Graph",
             icon: <FundFilled />,
-            content: <MapAndGraphTab item={item} />,
+            content: <MapAndGraphTab item={item} isFullscreen={isFullscreen} />,
         },
         {
             key: "3",
