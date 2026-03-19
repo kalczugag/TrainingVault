@@ -68,13 +68,7 @@ export const uploadFitActivity = async (
         if (fitBuffers.length === 0) {
             return res
                 .status(400)
-                .json(
-                    errorResponse(
-                        null,
-                        "No valid .fit files found in the upload",
-                        400,
-                    ),
-                );
+                .json(errorResponse(null, "No valid .fit files found", 400));
         }
 
         const results = { successful: 0, failed: 0, errors: [] as string[] };
@@ -120,6 +114,12 @@ export const uploadFitActivity = async (
                     oldestActivityDate = activityDate;
                 }
 
+                records.sort(
+                    (a: any, b: any) =>
+                        new Date(a.timestamp).getTime() -
+                        new Date(b.timestamp).getTime(),
+                );
+
                 const powerCurve = {
                     p1s: 0,
                     p5s: 0,
@@ -134,14 +134,12 @@ export const uploadFitActivity = async (
                     p1800s: 0,
                     p3600s: 0,
                 };
-
-                const powers = records.map((r: any) => r.power || 0);
+                const powers = records.map((r: any) => safeNum(r.power));
 
                 if (powers.length > 0) {
                     const windows = [
                         1, 5, 10, 20, 30, 60, 120, 300, 600, 1200, 1800, 3600,
                     ];
-
                     windows.forEach((w) => {
                         if (powers.length >= w) {
                             let currentSum = 0;
@@ -166,14 +164,11 @@ export const uploadFitActivity = async (
                 const calculatedWorkKj = (power * duration) / 1000;
 
                 let np = safeNum(session.normalized_power);
-
                 if (np === 0 && powers.length >= 30) {
                     let sumFourthPower = 0;
                     let count = 0;
                     let currentSum = 0;
-
                     for (let i = 0; i < 30; i++) currentSum += powers[i];
-
                     for (let i = 29; i < powers.length; i++) {
                         if (i > 29) {
                             currentSum =
@@ -198,24 +193,43 @@ export const uploadFitActivity = async (
                     finalTss = Math.round(rawTss);
                 }
 
-                const rawHrZones = session.time_in_hr_zone || [];
-                const rawPowerZones = session.time_in_power_zone || [];
-                const hrZones = [
-                    safeNum(rawHrZones[0]),
-                    safeNum(rawHrZones[1]),
-                    safeNum(rawHrZones[2]),
-                    safeNum(rawHrZones[3]),
-                    safeNum(rawHrZones[4]),
-                ];
-                const powerZones = [
-                    safeNum(rawPowerZones[0]),
-                    safeNum(rawPowerZones[1]),
-                    safeNum(rawPowerZones[2]),
-                    safeNum(rawPowerZones[3]),
-                    safeNum(rawPowerZones[4]),
-                    safeNum(rawPowerZones[5]),
-                    safeNum(rawPowerZones[6]),
-                ];
+                const pZones = [0, 0, 0, 0, 0, 0, 0];
+                const hZones = [0, 0, 0, 0, 0];
+                const userMaxHr = safeNum(session.max_heart_rate) || 190;
+
+                for (let i = 1; i < records.length; i++) {
+                    const prev = records[i - 1];
+                    const curr = records[i];
+                    const dt =
+                        (new Date(curr.timestamp).getTime() -
+                            new Date(prev.timestamp).getTime()) /
+                        1000;
+
+                    const timeToAdd = dt > 0 && dt < 10 ? dt : 1;
+
+                    if (curr.power != null) {
+                        const p = curr.power;
+                        if (p < 0.55 * userFtp) pZones[0] += timeToAdd;
+                        else if (p < 0.75 * userFtp) pZones[1] += timeToAdd;
+                        else if (p < 0.9 * userFtp) pZones[2] += timeToAdd;
+                        else if (p < 1.05 * userFtp) pZones[3] += timeToAdd;
+                        else if (p < 1.2 * userFtp) pZones[4] += timeToAdd;
+                        else if (p < 1.5 * userFtp) pZones[5] += timeToAdd;
+                        else pZones[6] += timeToAdd;
+                    }
+
+                    if (curr.heart_rate != null) {
+                        const hr = curr.heart_rate;
+                        if (hr < 0.6 * userMaxHr) hZones[0] += timeToAdd;
+                        else if (hr < 0.7 * userMaxHr) hZones[1] += timeToAdd;
+                        else if (hr < 0.8 * userMaxHr) hZones[2] += timeToAdd;
+                        else if (hr < 0.9 * userMaxHr) hZones[3] += timeToAdd;
+                        else hZones[4] += timeToAdd;
+                    }
+                }
+
+                const hrZones = hZones.map((z) => Math.round(z));
+                const powerZones = pZones.map((z) => Math.round(z));
 
                 const newActivity = await ActivityModel.create({
                     athleteId: userId,
@@ -340,24 +354,38 @@ export const uploadFitActivity = async (
 
                 if (records.length > 0) {
                     const streamDataToInsert = records.map((record: any) => ({
-                        timestamp: record.timestamp,
+                        timestamp: new Date(record.timestamp),
                         metadata: {
-                            activityId: dbActivityId,
-                            athleteId: userId,
+                            activityId: dbActivityId.toString(),
+                            athleteId: userId.toString(),
                         },
                         measurements: {
-                            watts: record.power || 0,
-                            hr: record.heart_rate || 0,
-                            cadence: record.cadence || 0,
-                            speedKmh: record.speed || 0,
-                            altitude: record.altitude || 0,
+                            watts: safeNum(record.power),
+                            hr: safeNum(record.heart_rate),
+                            cadence: safeNum(record.cadence),
+                            speedKmh: record.speed
+                                ? Number((record.speed * 3.6).toFixed(2))
+                                : 0,
+                            altitude: safeNum(record.altitude),
                             lat: record.position_lat || null,
                             lng: record.position_long || null,
                         },
                     }));
-                    await ActivityStreamModel.insertMany(streamDataToInsert, {
-                        ordered: false,
-                    });
+
+                    const BATCH_SIZE = 1000;
+                    for (
+                        let i = 0;
+                        i < streamDataToInsert.length;
+                        i += BATCH_SIZE
+                    ) {
+                        const batch = streamDataToInsert.slice(
+                            i,
+                            i + BATCH_SIZE,
+                        );
+                        await ActivityStreamModel.insertMany(batch, {
+                            ordered: false,
+                        });
+                    }
                 }
 
                 results.successful++;
@@ -389,7 +417,7 @@ export const uploadFitActivity = async (
                 ),
             );
     } catch (err: any) {
-        console.error(err.message);
+        console.error("Global upload error:", err.message);
         return res
             .status(500)
             .json(
