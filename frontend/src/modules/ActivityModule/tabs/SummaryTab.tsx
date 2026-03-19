@@ -47,8 +47,10 @@ const SummaryTab = ({ item }: ActivityModalContentProps) => {
                 { type: "input" },
                 {
                     type: "readonly",
-                    value: (
-                        Math.floor(item.summary.avgSpeed * SI * 10) / 10
+                    value: (Math.floor((item.summary.avgSpeed * SI * 10) / 10) >
+                    40
+                        ? item.summary.avgSpeed
+                        : (item.summary.avgSpeed * SI * 10) / 10
                     ).toFixed(1),
                 },
                 { type: "text", value: "kph", unit: "true" },

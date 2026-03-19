@@ -159,17 +159,39 @@ export const uploadFitActivity = async (
                     });
                 }
 
-                const np = safeNum(session.normalized_power);
                 const duration = safeNum(
                     session.total_timer_time || session.total_elapsed_time,
                 );
                 const power = safeNum(session.avg_power);
                 const calculatedWorkKj = (power * duration) / 1000;
 
+                let np = safeNum(session.normalized_power);
+
+                if (np === 0 && powers.length >= 30) {
+                    let sumFourthPower = 0;
+                    let count = 0;
+                    let currentSum = 0;
+
+                    for (let i = 0; i < 30; i++) currentSum += powers[i];
+
+                    for (let i = 29; i < powers.length; i++) {
+                        if (i > 29) {
+                            currentSum =
+                                currentSum - powers[i - 30] + powers[i];
+                        }
+                        const avg30 = currentSum / 30;
+                        sumFourthPower += Math.pow(avg30, 4);
+                        count++;
+                    }
+                    np = Math.round(Math.pow(sumFourthPower / count, 0.25));
+                } else if (np === 0 && powers.length > 0) {
+                    np = power;
+                }
+
                 let finalTss = safeNum(session.training_stress_score);
                 let finalIf = safeFloat(session.intensity_factor);
 
-                if (finalTss === 0 && np > 0) {
+                if ((finalTss === 0 || finalIf === 0) && np > 0) {
                     finalIf = safeFloat(np / userFtp);
                     const rawTss =
                         ((duration * np * finalIf) / (userFtp * 3600)) * 100;
