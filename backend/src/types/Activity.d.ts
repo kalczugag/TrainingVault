@@ -3,7 +3,7 @@ import type { SportType } from "./ActivityStream";
 interface Activity {
     _id: string;
     athleteId: string | null;
-    garminActivityId: string;
+    garminActivityId: string | null;
     title: string;
     manufacturer: string;
     sportType: SportType;

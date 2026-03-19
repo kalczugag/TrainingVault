@@ -45,6 +45,14 @@ const activities = (router: express.Router) => {
         }),
         methods.syncStream,
     );
+
+    router.post(
+        "/activities/upload",
+        passport.authenticate(["jwt"], {
+            session: false,
+        }),
+        methods.upload,
+    );
 };
 
 export default activities;

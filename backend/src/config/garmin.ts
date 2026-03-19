@@ -1,5 +1,6 @@
 import { GarminConnect } from "@flow-js/garmin-connect";
 import { decrypt } from "../utils/crypto";
+import { safeNum, safeFloat } from "utils/helpers";
 import { recalculatePMC } from "./pmcService";
 import { ActivityModel } from "../models/Activity";
 import { PlannedWorkoutModel } from "../models/PlannedWorkout";
@@ -128,7 +129,7 @@ export const removeGarminClient = (userId: string) => {
     pendingLogins.delete(userId);
 };
 
-const updateTop3 = (
+export const updateTop3 = (
     currentTop3: any[],
     newEffort: any,
     isTime: boolean = false,
@@ -162,18 +163,6 @@ const updateTop3 = (
     return currentTop3.some(
         (e) => e.garminActivityId === newEffort.garminActivityId,
     );
-};
-
-const safeNum = (value: unknown): number => {
-    if (value === null || value === undefined) return 0;
-    const num = Number(value);
-    return isNaN(num) ? 0 : Math.round(num);
-};
-
-const safeFloat = (value: unknown): number => {
-    if (value === null || value === undefined) return 0;
-    const num = Number(value);
-    return isNaN(num) ? 0 : parseFloat(num.toFixed(3));
 };
 
 export const syncGarminForUser = async (userId: string): Promise<number> => {

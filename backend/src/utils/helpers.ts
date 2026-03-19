@@ -84,3 +84,15 @@ export const parseFitFile = (fitBuffer: Buffer): Promise<any> => {
         });
     });
 };
+
+export const safeNum = (value: unknown): number => {
+    if (value === null || value === undefined) return 0;
+    const num = Number(value);
+    return isNaN(num) ? 0 : Math.round(num);
+};
+
+export const safeFloat = (value: unknown): number => {
+    if (value === null || value === undefined) return 0;
+    const num = Number(value);
+    return isNaN(num) ? 0 : parseFloat(num.toFixed(3));
+};
