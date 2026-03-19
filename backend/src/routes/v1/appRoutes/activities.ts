@@ -1,8 +1,14 @@
 import express from "express";
 import passport from "passport";
+import multer from "multer";
 
 import methods from "../../../controllers/activities";
 import { syncLimiter } from "../../../middlewares/rateLimiter";
+
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 100 * 1024 * 1024 },
+});
 
 const activities = (router: express.Router) => {
     router.get(
@@ -51,6 +57,7 @@ const activities = (router: express.Router) => {
         passport.authenticate(["jwt"], {
             session: false,
         }),
+        upload.array("files", 100),
         methods.upload,
     );
 };
