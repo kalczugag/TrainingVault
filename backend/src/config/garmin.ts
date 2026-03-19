@@ -1,6 +1,6 @@
 import { GarminConnect } from "@flow-js/garmin-connect";
 import { decrypt } from "../utils/crypto";
-import { safeNum, safeFloat } from "utils/helpers";
+import { safeNum, safeFloat } from "../utils/helpers";
 import { recalculatePMC } from "./pmcService";
 import { ActivityModel } from "../models/Activity";
 import { PlannedWorkoutModel } from "../models/PlannedWorkout";
