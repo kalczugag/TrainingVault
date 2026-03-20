@@ -60,6 +60,14 @@ const activities = (router: express.Router) => {
         upload.array("files", 100),
         methods.upload,
     );
+
+    router.delete(
+        "/activities/:activityId",
+        passport.authenticate(["jwt"], {
+            session: false,
+        }),
+        methods.delete,
+    );
 };
 
 export default activities;

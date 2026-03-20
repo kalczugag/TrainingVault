@@ -1,3 +1,4 @@
+import { deleteActivityById } from "./delete";
 import { exportActivity } from "./export";
 import { readActivities } from "./read";
 import { fetchAndSaveActivities } from "./readAndSave";
@@ -12,6 +13,7 @@ const methods = {
     syncStream: fetchAndSaveActivityStream,
     export: exportActivity,
     upload: uploadFitActivity,
+    delete: deleteActivityById,
 };
 
 export default methods;
