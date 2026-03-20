@@ -235,7 +235,7 @@ export const uploadFitActivity = async (
                     athleteId: userId,
                     garminActivityId: null,
                     title: `${session.name || "Activity"} (${activityDate.toLocaleDateString()})`,
-                    manufacturer: session.manufacturer || "unknown",
+                    manufacturer: session.manufacturer || "File Import",
                     sportType: session.sport || "cycling",
                     startTime: activityDate,
                     durationSec: duration,

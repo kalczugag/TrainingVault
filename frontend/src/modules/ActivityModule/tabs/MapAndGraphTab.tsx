@@ -26,7 +26,7 @@ const MapAndGraphTab = ({ item, isFullscreen }: MapAndGraphTabProps) => {
             garminActivityId: item?.garminActivityId,
         },
         {
-            skip: !item?._id || !item?.garminActivityId,
+            skip: !item?._id,
         },
     );
 
