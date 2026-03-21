@@ -23,6 +23,14 @@ export const activitiesApi = apiSlice.injectEndpoints({
                     params: queryParams,
                 };
             },
+
+            providesTags: (data) =>
+                data
+                    ? data.result.map((activity) => ({
+                          type: "Activity",
+                          id: activity._id,
+                      }))
+                    : [{ type: "Activity", id: "LIST" }],
         }),
 
         getActivityStream: builder.query<
@@ -35,8 +43,22 @@ export const activitiesApi = apiSlice.injectEndpoints({
                 body: { garminActivityId },
             }),
         }),
+
+        deleteActivity: builder.mutation<ApiResponseObject<Activity>, string>({
+            query: (activityId) => ({
+                url: `/activities/${activityId}`,
+                method: "DELETE",
+            }),
+
+            invalidatesTags: (result, error, activityId) => [
+                { type: "Activity", id: activityId },
+            ],
+        }),
     }),
 });
 
-export const { useGetActivitiesQuery, useGetActivityStreamQuery } =
-    activitiesApi;
+export const {
+    useGetActivitiesQuery,
+    useGetActivityStreamQuery,
+    useDeleteActivityMutation,
+} = activitiesApi;

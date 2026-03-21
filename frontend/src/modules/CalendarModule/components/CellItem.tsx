@@ -1,4 +1,4 @@
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import { Button, Card, Dropdown, type MenuProps } from "antd";
 import {
     CopyOutlined,

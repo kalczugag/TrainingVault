@@ -20,7 +20,7 @@ const activities = (router: express.Router) => {
     );
 
     router.get(
-        "/activities/:activityId",
+        "/activities/id/:activityId",
         passport.authenticate(["jwt"], {
             session: false,
         }),

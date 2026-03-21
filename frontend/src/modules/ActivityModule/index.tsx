@@ -16,6 +16,7 @@ import {
     FileOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
+import { useDeleteActivityMutation } from "@/store";
 import type { Activity } from "@/types/Activity";
 import ActivityCard from "./components/ActivityCard";
 import SideNavigation from "./components/SideNavigation";
@@ -30,6 +31,9 @@ const ActivityModal = ({ item }: ActivityModalProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
 
+    const [deleteActivity, { isLoading: isDeleteLoading }] =
+        useDeleteActivityMutation();
+
     const showModal = () => {
         setIsFullscreen(false);
         setIsModalOpen(true);
@@ -39,7 +43,8 @@ const ActivityModal = ({ item }: ActivityModalProps) => {
         setIsFullscreen((prev) => !prev);
     };
 
-    const handleDelete = () => {
+    const handleDelete = async () => {
+        await deleteActivity(item._id);
         setIsModalOpen(false);
     };
 
@@ -57,6 +62,8 @@ const ActivityModal = ({ item }: ActivityModalProps) => {
 
     const activityDate = dayjs(item.startTime).format("dddd D MMMM YYYY");
     const activityHour = dayjs(item.startTime).format("HH:mm");
+
+    const disabledButtons = isDeleteLoading;
 
     return (
         <>
@@ -140,16 +147,33 @@ const ActivityModal = ({ item }: ActivityModalProps) => {
                 footer={() => (
                     <>
                         <Divider />
-                        <Button type="text" onClick={handleDelete}>
+                        <Button
+                            type="text"
+                            onClick={handleDelete}
+                            loading={isDeleteLoading}
+                            disabled={disabledButtons}
+                        >
                             Delete
                         </Button>
-                        <Button type="text" onClick={handleCancel}>
+                        <Button
+                            type="text"
+                            onClick={handleCancel}
+                            disabled={disabledButtons}
+                        >
                             Cancel
                         </Button>
-                        <Button type="text" onClick={handleSave}>
+                        <Button
+                            type="text"
+                            onClick={handleSave}
+                            disabled={disabledButtons}
+                        >
                             Save
                         </Button>
-                        <Button type="primary" onClick={handleSaveAndClose}>
+                        <Button
+                            type="primary"
+                            onClick={handleSaveAndClose}
+                            disabled={disabledButtons}
+                        >
                             Save & close
                         </Button>
                     </>
