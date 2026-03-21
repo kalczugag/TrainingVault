@@ -13,7 +13,7 @@ const strava = (router: express.Router) => {
     );
 
     router.post(
-        "/strava/callback",
+        "/strava/connect",
         passport.authenticate(["jwt"], {
             session: false,
         }),

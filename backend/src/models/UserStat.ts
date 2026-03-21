@@ -9,7 +9,7 @@ const effortSchema = new mongoose.Schema<Effort>(
             ref: "Activity",
             required: true,
         },
-        garminActivityId: { type: String, required: true },
+        garminActivityId: { type: String, required: false },
         date: { type: Date, required: true },
     },
     { _id: false },

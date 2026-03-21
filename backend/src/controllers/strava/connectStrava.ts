@@ -22,9 +22,33 @@ export const connectStrava = async (
             },
         );
 
-        const stravaId = response.data.athlete.id.toString();
+        const { access_token, refresh_token, expires_at, athlete } =
+            response.data;
+        const stravaId = athlete.id.toString();
 
-        await UserModel.findByIdAndUpdate(userId, { stravaId });
+        const existingUser = await UserModel.findOne({
+            stravaId: stravaId,
+            _id: { $ne: userId },
+        });
+
+        if (existingUser) {
+            return res
+                .status(409)
+                .json(
+                    errorResponse(null, "Strava account already in use", 409),
+                );
+        }
+
+        await UserModel.findByIdAndUpdate(userId, {
+            $set: {
+                stravaId: stravaId,
+                stravaCredentials: {
+                    stravaAccessToken: access_token,
+                    stravaRefreshToken: refresh_token,
+                    stravaTokenExpiresAt: expires_at,
+                },
+            },
+        });
 
         return res
             .status(200)

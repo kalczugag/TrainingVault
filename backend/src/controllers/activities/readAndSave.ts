@@ -1,6 +1,6 @@
 import express from "express";
 import { errorResponse, successResponse } from "../../handlers/apiResponse";
-import { syncGarminForUser } from "../../config/garmin";
+import { syncStravaForUser } from "../../config/strava";
 import type { User } from "../../types/User";
 
 export const fetchAndSaveActivities = async (
@@ -10,7 +10,7 @@ export const fetchAndSaveActivities = async (
     try {
         const userId = (req.user as User)._id;
 
-        const newActivitiesCount = await syncGarminForUser(userId);
+        const newActivitiesCount = await syncStravaForUser(userId);
 
         return res.status(200).json(successResponse(newActivitiesCount));
     } catch (err: any) {

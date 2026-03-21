@@ -34,6 +34,11 @@ interface User {
         passwordEncrypted: string;
         iv: string;
     };
+    stravaCredentials: {
+        stravaAccessToken: string;
+        stravaRefreshToken: string;
+        stravaTokenExpiresAt: number;
+    };
     stravaId: string;
     metrics: {
         weightKg: number;

@@ -9,6 +9,7 @@ export const activitySchema = new mongoose.Schema<Activity>(
             ref: "User",
         },
         garminActivityId: String,
+        stravaActivityId: String,
         title: String,
         manufacturer: String,
         sportType: { type: String, enum: SPORT_TYPES, required: true },

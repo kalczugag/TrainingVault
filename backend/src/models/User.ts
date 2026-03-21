@@ -25,6 +25,15 @@ const garminCredentialsSchema = new mongoose.Schema(
     { _id: false },
 );
 
+const stravaCredentialsSchema = new mongoose.Schema(
+    {
+        stravaAccessToken: { type: String, required: true },
+        stravaRefreshToken: { type: String, required: true },
+        stravaTokenExpiresAt: { type: String, required: true },
+    },
+    { _id: false },
+);
+
 const zoneItemSchema = new mongoose.Schema<ZoneItem>(
     {
         name: { type: String, required: true },
@@ -64,6 +73,10 @@ export const userSchema = new mongoose.Schema<User>(
         birthDate: { type: Date, required: true },
         garminCredentials: {
             type: garminCredentialsSchema,
+            select: false,
+        },
+        stravaCredentials: {
+            type: stravaCredentialsSchema,
             select: false,
         },
         stravaId: {

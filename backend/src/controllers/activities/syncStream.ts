@@ -1,26 +1,17 @@
 import express from "express";
-import path from "path";
-import fs from "fs";
-import AdmZip from "adm-zip";
+import axios from "axios";
 import { errorResponse, successResponse } from "../../handlers/apiResponse";
-import { parseFitFile } from "../../utils/helpers";
-import { withGarminClient } from "../../config/garmin";
+import { getValidStravaToken } from "../../config/strava";
 import type { User } from "../../types/User";
-import { UserModel } from "../../models/User";
 import { ActivityStreamModel } from "../../models/ActivityStream";
 import { ActivityModel } from "../../models/Activity";
 
 export const fetchAndSaveActivityStream = async (
-    req: express.Request<
-        { dbActivityId: string },
-        {},
-        { garminActivityId: string }
-    >,
+    req: express.Request<{ dbActivityId: string }>,
     res: express.Response,
 ) => {
     try {
         const { dbActivityId } = req.params;
-        const { garminActivityId } = req.body;
         const userId = (req.user as User)._id;
 
         const streamExists = await ActivityStreamModel.find({
@@ -38,115 +29,129 @@ export const fetchAndSaveActivityStream = async (
                 );
         }
 
-        const user = await UserModel.findById(userId)
-            .select("+garminCredentials")
-            .exec();
-
-        if (!user || !user.garminCredentials) {
-            return res.status(404).json(errorResponse(null, "User not found"));
-        }
-
-        const downloadDir = path.resolve(__dirname, "../../files");
-
-        if (!fs.existsSync(downloadDir)) {
-            fs.mkdirSync(downloadDir, { recursive: true });
-        }
-
-        await withGarminClient(user._id, user.garminCredentials, (client) =>
-            client.downloadOriginalActivityData(
-                { activityId: Number(garminActivityId) },
-                downloadDir,
-            ),
-        );
-
-        const zipFilePath = path.join(downloadDir, `${garminActivityId}.zip`);
-
-        if (!fs.existsSync(zipFilePath)) {
-            return res
-                .status(404)
-                .json(errorResponse(null, "File not found", 404));
-        }
-
-        const zip = new AdmZip(zipFilePath);
-        const zipEntries = zip.getEntries();
-
-        const fitEntry = zipEntries.find((entry) =>
-            entry.entryName.toLocaleLowerCase().endsWith(".fit"),
-        );
-
-        if (!fitEntry) {
-            fs.unlinkSync(zipFilePath);
-
-            return res
-                .status(404)
-                .json(errorResponse(null, "Invalid FIT file", 404));
-        }
-
-        const fitBuffer = fitEntry.getData();
-
-        const parsedData = await parseFitFile(fitBuffer);
-
-        if (!parsedData || parsedData.records.length === 0) {
-            return res
-                .status(400)
-                .json(errorResponse(null, "Invalid FIT file", 400));
-        }
-
-        const streamDataToInsert = parsedData.records.map((record: any) => ({
-            timestamp: record.timestamp,
-            metadata: {
-                activityId: dbActivityId,
-                athleteId: userId,
-            },
-            measurements: {
-                watts: record.power || 0,
-                hr: record.heart_rate || 0,
-                cadence: record.cadence || 0,
-                speedKmh: record.speed || 0,
-                altitude: record.altitude || 0,
-                lat: record.position_lat || null,
-                lng: record.position_long || null,
-            },
-        }));
-
-        await ActivityStreamModel.insertMany(streamDataToInsert, {
-            ordered: false,
+        const activity = await ActivityModel.findOne({
+            _id: dbActivityId,
+            athleteId: userId,
         });
 
-        if (parsedData.laps && parsedData.laps.length > 0) {
-            const lapsToInsert = parsedData.laps.map(
-                (lap: any, index: number) => ({
-                    lapIndex: index + 1,
-                    startTime: lap.start_time,
-                    durationSec:
-                        lap.total_timer_time || lap.total_elapsed_time || 0,
-                    distanceMeters: lap.total_distance || 0,
-                    avgPower: lap.avg_power || 0,
-                    maxPower: lap.max_power || 0,
-                    avgHr: lap.avg_heart_rate || 0,
-                    maxHr: lap.max_heart_rate || 0,
-                    avgCadence: lap.avg_cadence || 0,
-                    avgSpeed: lap.avg_speed || 0,
-                }),
-            );
+        if (!activity) {
+            return res
+                .status(404)
+                .json(errorResponse(null, "Activity not found", 404));
+        }
+
+        if (!activity.stravaActivityId) {
+            return res
+                .status(400)
+                .json(
+                    errorResponse(
+                        null,
+                        "This activity is not linked to Strava (missing stravaActivityId)",
+                        400,
+                    ),
+                );
+        }
+
+        const token = await getValidStravaToken(userId.toString());
+        const headers = { Authorization: `Bearer ${token}` };
+
+        const keys =
+            "time,latlng,distance,altitude,velocity_smooth,heartrate,cadence,watts";
+        const [streamRes, lapsRes] = await Promise.all([
+            axios
+                .get(
+                    `https://www.strava.com/api/v3/activities/${activity.stravaActivityId}/streams`,
+                    {
+                        headers,
+                        params: { keys, key_by_type: true },
+                    },
+                )
+                .catch(() => ({ data: {} })),
+            axios
+                .get(
+                    `https://www.strava.com/api/v3/activities/${activity.stravaActivityId}/laps`,
+                    {
+                        headers,
+                    },
+                )
+                .catch(() => ({ data: [] })),
+        ]);
+
+        const stravaStreams = streamRes.data || {};
+        const stravaLaps = lapsRes.data || [];
+
+        const sMap: Record<string, any[]> = {};
+
+        if (Array.isArray(stravaStreams)) {
+            stravaStreams.forEach((s: any) => {
+                sMap[s.type] = s.data;
+            });
+        } else if (typeof stravaStreams === "object") {
+            Object.keys(stravaStreams).forEach((key) => {
+                sMap[key] = stravaStreams[key].data || [];
+            });
+        }
+
+        const timeArr = sMap.time || [];
+        const activityDate = new Date(activity.startTime);
+
+        let streamDataToInsert: any[] = [];
+        if (timeArr.length > 0) {
+            streamDataToInsert = timeArr.map((t: number, i: number) => ({
+                timestamp: new Date(activityDate.getTime() + t * 1000),
+                metadata: {
+                    activityId: dbActivityId,
+                    athleteId: userId,
+                },
+                measurements: {
+                    watts: sMap.watts?.[i] || 0,
+                    hr: sMap.heartrate?.[i] || 0,
+                    cadence: sMap.cadence?.[i] || 0,
+                    speedKmh: sMap.velocity_smooth?.[i]
+                        ? Number((sMap.velocity_smooth[i] * 3.6).toFixed(2))
+                        : 0,
+                    altitude: sMap.altitude?.[i] || 0,
+                    lat: sMap.latlng?.[i]?.[0] || null,
+                    lng: sMap.latlng?.[i]?.[1] || null,
+                },
+            }));
+
+            const BATCH_SIZE = 1000;
+            for (let i = 0; i < streamDataToInsert.length; i += BATCH_SIZE) {
+                await ActivityStreamModel.insertMany(
+                    streamDataToInsert.slice(i, i + BATCH_SIZE),
+                    { ordered: false },
+                );
+            }
+        }
+
+        if (stravaLaps.length > 0) {
+            const lapsToInsert = stravaLaps.map((lap: any) => ({
+                lapIndex: lap.lap_index,
+                startTime: lap.start_date,
+                durationSec: lap.elapsed_time || 0,
+                distanceMeters: lap.distance || 0,
+                avgPower: lap.average_watts || 0,
+                maxPower: lap.max_watts || 0,
+                avgHr: lap.average_heartrate || 0,
+                maxHr: lap.max_heartrate || 0,
+                avgCadence: lap.average_cadence || 0,
+                avgSpeed: lap.average_speed || 0,
+            }));
 
             await ActivityModel.findByIdAndUpdate(
                 dbActivityId,
-                {
-                    $set: { laps: lapsToInsert },
-                },
+                { $set: { laps: lapsToInsert } },
                 { new: true },
             );
         }
-
-        fs.unlinkSync(zipFilePath);
 
         return res
             .status(200)
             .json(
                 successResponse(
                     streamDataToInsert,
-                    "Stream synchronized successfully",
+                    "Stream synchronized successfully from Strava",
                 ),
             );
     } catch (err: any) {

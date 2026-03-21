@@ -1,16 +1,22 @@
 import express from "express";
-import { syncGarminForUser } from "../../config/garmin";
+import { processStravaActivity } from "../../config/strava";
+import { recalculatePMC } from "../../config/pmcService";
 import { UserModel } from "../../models/User";
 
 export const stravaWebhook = async (
     req: express.Request<
         {},
         {},
-        { object_type: string; aspect_type: string; owner_id: string }
+        {
+            object_type: string;
+            aspect_type: string;
+            owner_id: string;
+            object_id: string;
+        }
     >,
     res: express.Response,
 ) => {
-    const { object_type, aspect_type, owner_id } = req.body;
+    const { object_type, aspect_type, owner_id, object_id } = req.body;
 
     console.log(
         `Event received ${object_type} ${aspect_type} from user ${owner_id}`,
@@ -27,7 +33,14 @@ export const stravaWebhook = async (
             if (user) {
                 console.log("user found");
 
-                syncGarminForUser(user._id).catch((err) => console.error(err));
+                const result = await processStravaActivity(
+                    object_id,
+                    user._id.toString(),
+                );
+
+                if (result.status === "created" && result.date) {
+                    await recalculatePMC(user._id.toString(), result.date);
+                }
             } else {
                 console.error("User not found");
             }
