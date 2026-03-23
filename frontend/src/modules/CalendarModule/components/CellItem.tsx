@@ -11,6 +11,7 @@ import {
 } from "@ant-design/icons";
 import ActivityModal from "@/modules/ActivityModule";
 import type { Activity } from "@/types/Activity";
+import PlannedActivityModule from "@/modules/PlannedActivityModule";
 
 interface CellItemProps {
     value: dayjs.Dayjs;
@@ -26,6 +27,7 @@ const CellItem = ({
     setSelectedDate,
 }: CellItemProps) => {
     const currentDate = value.format("YYYY-MM-DD");
+    const dateFormatLong = value.format("dddd, MMMM DD YYYY");
 
     const isActualMonth = value.isSame(dayjs(), "month");
     const isActualWeek = value.isSame(dayjs(), "isoWeek");
@@ -174,14 +176,7 @@ const CellItem = ({
                     {listData?.map((item) => (
                         <ActivityModal key={item._id} item={item} />
                     ))}
-                    <Button
-                        type="text"
-                        color="default"
-                        variant="outlined"
-                        className="w-full opacity-0  group-hover:opacity-100 transition-opacity duration-200"
-                    >
-                        <PlusOutlined />
-                    </Button>
+                    <PlannedActivityModule date={dateFormatLong} />
                 </ul>
             </Card>
         </div>
