@@ -1,33 +1,54 @@
-import { Button, Space, Typography } from "antd";
-import bikeIcon from "@/style/images/bike.svg";
+import { Button, Col, Row, Space, Typography } from "antd";
 
 const { Text } = Typography;
 
 interface ItemsListProps {
     title: string;
+    span?: number;
     items: {
+        key: string;
         icon?: string;
         title: string;
         onClick?: () => void;
     }[];
 }
 
-const Item = ({ title, icon }: { title: string; icon: string }) => {
+const Item = ({
+    title,
+    icon,
+    span,
+    onClick,
+}: {
+    title: string;
+    icon?: string;
+    span: number;
+    onClick?: () => void;
+}) => {
     return (
-        <li>
-            <Button>
-                <img src={icon} className="h-6" />
+        <Col span={span}>
+            <Button onClick={onClick} style={{ width: "100%" }}>
+                {icon && <img src={icon} alt={title} className="" />}
                 <span>{title}</span>
             </Button>
-        </li>
+        </Col>
     );
 };
 
-const ItemsList = ({ title }: ItemsListProps) => {
+const ItemsList = ({ key, span = 6, title, items }: ItemsListProps) => {
     return (
-        <Space>
-            <Text>{title}</Text>
-            <Item title="Bike" icon={bikeIcon} />
+        <Space vertical>
+            <Text type="secondary">{title}</Text>
+            <Row gutter={[16, 16]}>
+                {items.map((item) => (
+                    <Item
+                        key={item.title}
+                        span={span}
+                        title={item.title}
+                        icon={item.icon}
+                        onClick={item.onClick}
+                    />
+                ))}
+            </Row>
         </Space>
     );
 };

@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { Card, Flex } from "antd";
-import bikeIcon from "@/style/images/bike.svg";
+import { bike } from "@/style/images/activityIcons";
 import type { Activity } from "@/types/Activity";
 
 interface ActivityCardProps {
@@ -21,7 +21,7 @@ const ActivityCard = ({ item, showModal }: ActivityCardProps) => {
                             <Flex vertical gap={4}>
                                 <img
                                     alt="bike icon"
-                                    src={bikeIcon}
+                                    src={bike}
                                     className="w-6"
                                 />
                                 <span className="text-xs">{item.title}</span>

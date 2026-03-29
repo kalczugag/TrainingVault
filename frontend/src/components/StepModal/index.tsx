@@ -1,10 +1,16 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Modal } from "antd";
 
+interface StepNavProps {
+    next: () => void;
+    back: () => void;
+    goTo: (key: string) => void;
+}
+
 export interface StepModalItemProps {
     key: string;
     title: ReactNode;
-    content: ReactNode;
+    content: (nav: StepNavProps) => ReactNode;
 }
 
 interface StepModalProps {
@@ -21,12 +27,10 @@ const StepModal = ({ steps, open, onCancel, onFinish }: StepModalProps) => {
         if (open && steps.length > 0) {
             setActiveKey(steps[0].key);
         }
-    }, [open, steps]);
+    }, [open]);
 
     const activeStepIndex = steps.findIndex((step) => step.key === activeKey);
-    const activeStep = steps[activeStepIndex];
-
-    const dynamicTitle = activeStep && `${activeStep.title}`;
+    const activeStep = steps[activeStepIndex] || steps[0];
 
     const handleNext = () => {
         if (activeStepIndex < steps.length - 1) {
@@ -46,11 +50,18 @@ const StepModal = ({ steps, open, onCancel, onFinish }: StepModalProps) => {
         <Modal
             destroyOnHidden
             centered
-            title={dynamicTitle}
+            title={activeStep?.title}
             open={open}
             onOk={onFinish}
             onCancel={onCancel}
-        ></Modal>
+            footer={false}
+        >
+            {activeStep?.content({
+                next: handleNext,
+                back: handleBack,
+                goTo: setActiveKey,
+            })}
+        </Modal>
     );
 };
 

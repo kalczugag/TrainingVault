@@ -230,7 +230,7 @@ const MapAndGraphTab = ({ item, isFullscreen }: MapAndGraphTabProps) => {
                         ? "100%"
                         : isFullscreen
                           ? "60vh"
-                          : "400px",
+                          : "250px",
                     borderRadius: isMapFullscreen ? "0px" : "8px",
                     position: "relative",
                     overflow: "hidden",
