@@ -2,7 +2,9 @@ import { useState } from "react";
 import { Button, Space } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import ItemsList from "./components/ItemsList";
-import StepModal, { type StepModalItemProps } from "@/components/StepModal";
+import StepModal, {
+    type StepModalItemProps,
+} from "@/components/Modals/StepModal";
 import { activityIcons } from "@/style/images/activityIcons";
 
 interface PlannedActivityModuleProps {

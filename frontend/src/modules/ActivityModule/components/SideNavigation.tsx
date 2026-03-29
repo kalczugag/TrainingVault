@@ -84,8 +84,9 @@ const SideNavigation = ({ item, isFullscreen }: SideMenuProps) => {
                     maxHeight: "60vh",
                     overflowY: "auto",
                     overflowX: "hidden",
+                    paddingTop: "8px",
+                    paddingBottom: "8px",
                     paddingRight: "8px",
-                    margin: "16px 0",
                 },
             }}
         />

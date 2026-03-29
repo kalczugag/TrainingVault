@@ -130,6 +130,7 @@ const PowerTab = ({ item, isFullscreen }: PowerTabProps) => {
         data,
         xField: "time",
         yField: "value",
+        width: isFullscreen ? 500 : 600,
         shapeField: "smooth",
         scale: {
             y: {
@@ -166,7 +167,7 @@ const PowerTab = ({ item, isFullscreen }: PowerTabProps) => {
         <>
             <Title level={4}>Zone Distibution</Title>
             <Space
-                orientation={isFullscreen ? "horizontal" : "vertical"}
+                vertical
                 align={isFullscreen ? "start" : undefined}
                 size={12}
                 style={{ width: "100%" }}
