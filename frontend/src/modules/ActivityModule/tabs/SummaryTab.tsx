@@ -10,9 +10,10 @@ const { TextArea } = Input;
 
 interface ActivityModalContentProps {
     item: Activity;
+    isFullscreen: boolean;
 }
 
-const SummaryTab = ({ item }: ActivityModalContentProps) => {
+const SummaryTab = ({ item, isFullscreen }: ActivityModalContentProps) => {
     const summaryStatsConfig: TableRowData[] = [
         {
             key: "duration",
@@ -144,7 +145,7 @@ const SummaryTab = ({ item }: ActivityModalContentProps) => {
     };
 
     return (
-        <Flex gap={40}>
+        <Flex gap={40} vertical={isFullscreen}>
             <Space style={{ flex: 1 }} size="large" vertical>
                 <SummaryTable
                     header={["Planned", "Completed"]}

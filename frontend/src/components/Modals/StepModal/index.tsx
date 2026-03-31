@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Modal } from "antd";
+import { Modal, type ModalProps } from "antd";
 
 interface StepNavProps {
     next: () => void;
@@ -9,18 +9,26 @@ interface StepNavProps {
 
 export interface StepModalItemProps {
     key: string;
-    title: ReactNode;
+    title?: ReactNode;
     content: (nav: StepNavProps) => ReactNode;
 }
 
-interface StepModalProps {
+interface StepModalProps extends ModalProps {
     open: boolean;
     steps: StepModalItemProps[];
+    layout?: React.ElementType;
     onCancel: () => void;
     onFinish: () => void;
 }
 
-const StepModal = ({ steps, open, onCancel, onFinish }: StepModalProps) => {
+const StepModal = ({
+    steps,
+    open,
+    layout: Layout,
+    onCancel,
+    onFinish,
+    ...props
+}: StepModalProps) => {
     const [activeKey, setActiveKey] = useState(steps[0]?.key || "");
 
     useEffect(() => {
@@ -46,21 +54,24 @@ const StepModal = ({ steps, open, onCancel, onFinish }: StepModalProps) => {
         }
     };
 
+    const content = activeStep?.content({
+        next: handleNext,
+        back: handleBack,
+        goTo: setActiveKey,
+    });
+
     return (
         <Modal
             destroyOnHidden
             centered
-            title={activeStep?.title}
+            title={activeStep?.title || undefined}
             open={open}
             onOk={onFinish}
             onCancel={onCancel}
             footer={false}
+            {...props}
         >
-            {activeStep?.content({
-                next: handleNext,
-                back: handleBack,
-                goTo: setActiveKey,
-            })}
+            {Layout ? <Layout>{content}</Layout> : content}
         </Modal>
     );
 };

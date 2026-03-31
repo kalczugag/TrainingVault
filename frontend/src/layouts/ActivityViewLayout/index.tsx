@@ -1,10 +1,10 @@
-import { Layout, Flex, Row, Col, Typography } from "antd";
-import SideNavigation from "../components/SideNavigation";
+import { Flex, Row, Col, Typography } from "antd";
 import type { Activity } from "@/types/Activity";
 
 interface ActivityViewLayout {
-    item: Activity;
     isFullscreen: boolean;
+    topContent: React.ReactNode;
+    mainContent: React.ReactNode;
     header: React.ReactNode;
     footer: React.ReactNode;
 }
@@ -12,8 +12,9 @@ interface ActivityViewLayout {
 const { Title } = Typography;
 
 const ActivityViewLayout = ({
-    item,
     isFullscreen,
+    topContent,
+    mainContent,
     header,
     footer,
 }: ActivityViewLayout) => {
@@ -22,25 +23,23 @@ const ActivityViewLayout = ({
             <div style={{ marginBottom: 16 }}>{header}</div>
 
             {isFullscreen && (
-                <div className="bg-slate-50 border border-slate-200 rounded-md flex items-center justify-center mb-4 min-h-[150px]">
-                    <span className="text-slate-400">
-                        here will be a big chart
-                    </span>
+                <div className="bg-slate-50 border border-slate-200 rounded-md flex items-center justify-center mb-4 min-h-37.5">
+                    {topContent}
                 </div>
             )}
 
             <Row gutter={24} style={{ flex: 1 }}>
                 <Col
-                    span={isFullscreen ? 8 : 24}
+                    span={isFullscreen ? 12 : 24}
                     style={{ height: isFullscreen ? "50vh" : "60vh" }}
                 >
-                    <SideNavigation item={item} isFullscreen={isFullscreen} />
+                    {mainContent}
                 </Col>
 
                 {isFullscreen && (
-                    <Col span={16}>
+                    <Col span={12}>
                         <div className="h-full pl-6 border-l border-gray-200">
-                            <Title level={3} title="Advanced Analysis" />
+                            <Title level={4}>Advanced Analysis</Title>
                             <p className="text-gray-500">
                                 <ul className="list-disc ml-5 mt-2">
                                     <li>laps</li>

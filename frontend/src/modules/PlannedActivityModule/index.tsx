@@ -1,11 +1,19 @@
 import { useState } from "react";
-import { Button, Space } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { Button, Descriptions, Flex, Space, Tooltip } from "antd";
+import {
+    ArrowsAltOutlined,
+    CloseOutlined,
+    FileOutlined,
+    PlusOutlined,
+    ShrinkOutlined,
+} from "@ant-design/icons";
 import ItemsList from "./components/ItemsList";
 import StepModal, {
     type StepModalItemProps,
 } from "@/components/Modals/StepModal";
 import { activityIcons } from "@/style/images/activityIcons";
+import dayjs from "dayjs";
+import ActivityViewLayout from "@/layouts/ActivityViewLayout";
 
 interface PlannedActivityModuleProps {
     date: string;
@@ -13,6 +21,11 @@ interface PlannedActivityModuleProps {
 
 const PlannedActivityModule = ({ date }: PlannedActivityModuleProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isFullscreen, setIsFullscreen] = useState(false);
+
+    const toggleFullscreen = () => {
+        setIsFullscreen((prev) => !prev);
+    };
 
     const showModal = () => {
         setIsModalOpen(true);
@@ -25,6 +38,73 @@ const PlannedActivityModule = ({ date }: PlannedActivityModuleProps) => {
     const handleCancel = () => {
         setIsModalOpen(false);
     };
+
+    const customHeader = (
+        <Flex vertical gap={8}>
+            <Flex align="center" justify="space-between">
+                <span className="text-blue-500 text-sm font-medium">
+                    {date}
+                </span>
+                <Space size={0}>
+                    <Button
+                        type="text"
+                        onClick={toggleFullscreen}
+                        icon={
+                            isFullscreen ? (
+                                <ShrinkOutlined />
+                            ) : (
+                                <ArrowsAltOutlined />
+                            )
+                        }
+                    />
+                    <Button
+                        type="text"
+                        onClick={handleCancel}
+                        icon={<CloseOutlined />}
+                    />
+                </Space>
+            </Flex>
+            <Flex gap={8} align="start">
+                <Descriptions
+                    style={{
+                        backgroundColor: "#F1F3F7",
+                        padding: "8px",
+                        borderRadius: "4px",
+                    }}
+                    column={3}
+                    styles={{ content: { textWrap: "nowrap" } }}
+                    title="Untitled Workout"
+                >
+                    <Descriptions.Item label="Duration">
+                        --:--:--
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Distance">--</Descriptions.Item>
+                    <Descriptions.Item label="TSS">--</Descriptions.Item>
+                </Descriptions>
+                <Flex vertical justify="space-between" gap={8}>
+                    <Tooltip
+                        title="A file from a connected device or you computer."
+                        placement="bottom"
+                    >
+                        <Button icon={<FileOutlined />}>Upload</Button>
+                    </Tooltip>
+                    <Button disabled type="primary" onClick={toggleFullscreen}>
+                        Analyze
+                    </Button>
+                </Flex>
+            </Flex>
+        </Flex>
+    );
+
+    const customFooter = (
+        <Flex justify="end" gap={8} style={{ marginTop: 16 }}>
+            <Button onClick={handleCancel}>Cancel</Button>
+            <Button onClick={handleOk}>Save</Button>
+            <Button type="primary" onClick={() => {}}>
+                Save & Close
+            </Button>
+        </Flex>
+    );
 
     const steps: StepModalItemProps[] = [
         {
@@ -195,17 +275,12 @@ const PlannedActivityModule = ({ date }: PlannedActivityModuleProps) => {
         },
         {
             key: "2",
-            title: "Training Details",
             content: ({ back }) => (
-                <div>
-                    <p>Here is the second step.</p>
-                    <div className="flex justify-between mt-4">
-                        <Button onClick={back}>Back</Button>
-                        <Button type="primary" onClick={handleOk}>
-                            Save in Calendar
-                        </Button>
-                    </div>
-                </div>
+                <ActivityViewLayout
+                    isFullscreen={isFullscreen}
+                    header={customHeader}
+                    footer={customFooter}
+                />
             ),
         },
     ];
@@ -226,6 +301,11 @@ const PlannedActivityModule = ({ date }: PlannedActivityModuleProps) => {
                 open={isModalOpen}
                 onCancel={handleCancel}
                 onFinish={handleOk}
+                closable={false}
+                centered
+                destroyOnHidden
+                width={isFullscreen ? "95vw" : "750px"}
+                style={{ transition: "all 0.3s" }}
             />
             {/* <Modal
 

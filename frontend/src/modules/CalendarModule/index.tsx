@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import updateLocale from "dayjs/plugin/updateLocale";
@@ -56,6 +56,48 @@ const CalendarModule = ({
         return info.originNode;
     };
 
+    // format YYYY-MM-DD
+    const scrollToDate = (targetDate: string) => {
+        const el = document.getElementById(targetDate);
+
+        if (el) {
+            el.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+            });
+        } else {
+            console.error("Element not found: ", targetDate);
+        }
+    };
+
+    const handleGoToDate = (targetString: string) => {
+        const targetDate = dayjs(targetString);
+
+        const isSameMonthAndYear =
+            targetDate.isSame(currentDate, "month") &&
+            targetDate.isSame(currentDate, "year");
+
+        if (isSameMonthAndYear) {
+            scrollToDate(targetString);
+        } else {
+            setCurrentDate(targetDate);
+
+            setTimeout(() => {
+                scrollToDate(targetString);
+            }, 200);
+        }
+    };
+
+    useEffect(() => {
+        if (selectedDate) {
+            scrollToDate(selectedDate);
+        }
+    }, [selectedDate]);
+
+    useEffect(() => {
+        scrollToDate(currentDate.format("YYYY-MM-DD"));
+    }, [currentDate]);
+
     return (
         <ConfigProvider locale={enGB}>
             <div className=" relative flex flex-row gap-6 w-full">
@@ -69,7 +111,10 @@ const CalendarModule = ({
                         headerRender={({ value, onChange }) => (
                             <CalendarHeader
                                 value={value}
-                                onChange={onChange}
+                                onChange={(e) => {
+                                    onChange(e);
+                                    handleGoToDate(e.format("YYYY-MM-DD"));
+                                }}
                                 setSelectedDate={setSelectedDate}
                             />
                         )}

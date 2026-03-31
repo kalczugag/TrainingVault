@@ -92,7 +92,7 @@ const CellItem = ({
     ];
 
     return (
-        <div className="relative h-full">
+        <div className="relative h-full" id={currentDate}>
             {isSelected && (
                 <div
                     className="absolute inset-0 z-1 bg-[#9dbeff] w-full h-full opacity-50"

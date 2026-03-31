@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useDeleteActivityMutation } from "@/store";
-import type { Activity } from "@/types/Activity";
 import dayjs from "dayjs";
 import { Button, Descriptions, Flex, Modal, Space, Tooltip } from "antd";
 import {
@@ -9,8 +8,10 @@ import {
     FileOutlined,
     ShrinkOutlined,
 } from "@ant-design/icons";
+import type { Activity } from "@/types/Activity";
+import ActivityViewLayout from "@/layouts/ActivityViewLayout";
 import ActivityCard from "./components/ActivityCard";
-import ActivityViewLayout from "./Layouts/ActivityViewLayout";
+import SideNavigation from "./components/SideNavigation";
 
 interface ActivityModalProps {
     item: Activity;
@@ -88,7 +89,7 @@ const ActivityModal = ({ item }: ActivityModalProps) => {
                     }}
                     column={3}
                     styles={{ content: { textWrap: "nowrap" } }}
-                    title={item.title}
+                    title={item.title + " - " + item._id}
                 >
                     <Descriptions.Item label="Duration">
                         {dayjs
@@ -143,8 +144,18 @@ const ActivityModal = ({ item }: ActivityModalProps) => {
                 style={{ transition: "all 0.3s" }}
             >
                 <ActivityViewLayout
-                    item={item}
                     isFullscreen={isFullscreen}
+                    topContent={
+                        <span className="text-slate-400">
+                            here will be a big chart
+                        </span>
+                    }
+                    mainContent={
+                        <SideNavigation
+                            item={item}
+                            isFullscreen={isFullscreen}
+                        />
+                    }
                     header={customHeader}
                     footer={customFooter}
                 />

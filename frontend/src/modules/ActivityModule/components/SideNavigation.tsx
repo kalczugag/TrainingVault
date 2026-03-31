@@ -26,7 +26,7 @@ const SideNavigation = ({ item, isFullscreen }: SideMenuProps) => {
             key: "1",
             title: "Summary",
             icon: <FileFilled />,
-            content: <SummaryTab item={item} />,
+            content: <SummaryTab item={item} isFullscreen={isFullscreen} />,
         },
         {
             key: "2",
@@ -73,15 +73,12 @@ const SideNavigation = ({ item, isFullscreen }: SideMenuProps) => {
             onChange={(key) => setActiveTab(key)}
             items={tabItems}
             styles={{
-                root: {
-                    height: "100%",
-                },
+                root: {},
                 item: {
                     padding: 0,
                 },
                 content: {
-                    height: "100%",
-                    maxHeight: "60vh",
+                    maxHeight: isFullscreen ? "50vh" : "60vh",
                     overflowY: "auto",
                     overflowX: "hidden",
                     paddingTop: "8px",
