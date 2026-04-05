@@ -1,7 +1,15 @@
 import { useState } from "react";
 import { useDeleteActivityMutation } from "@/store";
 import dayjs from "dayjs";
-import { Button, Descriptions, Flex, Modal, Space, Tooltip } from "antd";
+import {
+    Button,
+    Descriptions,
+    Flex,
+    Modal,
+    Popconfirm,
+    Space,
+    Tooltip,
+} from "antd";
 import {
     ArrowsAltOutlined,
     CloseOutlined,
@@ -120,9 +128,18 @@ const ActivityModal = ({ item }: ActivityModalProps) => {
 
     const customFooter = (
         <Flex justify="end" gap={8} style={{ marginTop: 16 }}>
-            <Button danger onClick={handleDelete} loading={isDeleteLoading}>
-                Delete
-            </Button>
+            <Popconfirm
+                title="Delete"
+                description="Are you sure to delete this activity?"
+                onConfirm={handleDelete}
+                disabled={isDeleteLoading}
+                okText="Yes"
+                cancelText="No"
+            >
+                <Button danger disabled={isDeleteLoading}>
+                    Delete
+                </Button>
+            </Popconfirm>
             <Button onClick={() => setIsModalOpen(false)}>Cancel</Button>
             <Button type="primary" onClick={handleSaveAndClose}>
                 Save & Close

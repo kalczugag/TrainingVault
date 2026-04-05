@@ -9,6 +9,7 @@ export interface TableCell {
     placeholder?: string;
     isBlue?: boolean;
     unit?: string;
+    step?: number;
     span?: number;
     align?: "left" | "center" | "right";
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -37,6 +38,7 @@ const SummaryTable = ({
                     <Input
                         size="small"
                         value={cell.value}
+                        step={cell.step}
                         placeholder={cell.placeholder}
                         onChange={cell.onChange}
                         style={{ textAlign: "center", width: "100%" }}

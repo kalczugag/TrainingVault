@@ -16,7 +16,8 @@ const NavigationLayout = ({ children }: NavigationLayoutProps) => {
                 style={{
                     marginTop: "50px",
                     background: "#FFF",
-                    padding: "16px",
+                    paddingTop: "16px",
+                    paddingBottom: "16px",
                 }}
             >
                 <div>{children}</div>
