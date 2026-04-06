@@ -1,4 +1,4 @@
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { Button, Card, Dropdown, type MenuProps } from "antd";
 import {
     CopyOutlined,
@@ -17,6 +17,7 @@ interface CellItemProps {
     value: dayjs.Dayjs;
     listData: Activity[];
     selectedDate: string | null;
+    currentMonth: Dayjs;
     setSelectedDate: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
@@ -24,15 +25,14 @@ const CellItem = ({
     value,
     listData,
     selectedDate,
+    currentMonth,
     setSelectedDate,
 }: CellItemProps) => {
     const currentDate = value.format("YYYY-MM-DD");
     const dateFormatLong = value.format("dddd, MMMM DD YYYY");
 
-    const isActualMonth = value.isSame(dayjs(), "month");
-    const isActualWeek = value.isSame(dayjs(), "isoWeek");
+    const isActualMonth = value.isSame(currentMonth, "month");
     const isToday = value.isSame(dayjs(), "day");
-
     const isSelected = selectedDate === currentDate;
 
     const items: MenuProps["items"] = [
@@ -92,29 +92,34 @@ const CellItem = ({
     ];
 
     return (
-        <div className="relative h-full" id={currentDate}>
+        <div
+            id={`day-${currentDate}`}
+            className="relative h-full flex flex-col min-h-35 group cursor-default"
+            onClick={(e) => {
+                e.stopPropagation();
+                setSelectedDate(isSelected ? null : currentDate);
+            }}
+        >
             {isSelected && (
-                <div
-                    className="absolute inset-0 z-1 bg-[#9dbeff] w-full h-full opacity-50"
-                    onClick={() => setSelectedDate(null)}
-                />
+                <div className="absolute inset-0 bg-blue-100 opacity-30 z-10 pointer-events-none" />
             )}
             <Card
                 size="small"
                 title={
-                    <div
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedDate(isSelected ? null : currentDate);
-                        }}
+                    <span
+                        className={`text-sm font-medium ${isToday ? "text-blue-600" : isActualMonth ? "text-gray-700" : "text-gray-300"}`}
+                        // onClick={(e) => {
+                        //     e.stopPropagation();
+                        //     setSelectedDate(isSelected ? null : currentDate);
+                        // }}
                     >
-                        {isToday && "Today"} {value.format("DD")}
-                    </div>
+                        {isToday && "Today "} {value.format("DD")}
+                    </span>
                 }
-                className="group cursor-default"
+                className="group cursor-default shadow-none"
                 extra={
                     <div
-                        className="opacity-0  group-hover:opacity-100 transition-opacity duration-200"
+                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <Dropdown trigger={["click"]} menu={{ items }}>
@@ -122,7 +127,10 @@ const CellItem = ({
                                 icon={
                                     <MenuOutlined
                                         style={{
-                                            color: isToday ? "#FFF" : undefined,
+                                            color: isToday
+                                                ? "#1840EC"
+                                                : "#9ca3af",
+                                            fontSize: "12px",
                                         }}
                                     />
                                 }
@@ -134,45 +142,25 @@ const CellItem = ({
                 }
                 styles={{
                     root: {
-                        backgroundColor: "#FFF",
-                        textAlign: "left",
-                        border: "none",
-                        borderTop: "1px groove",
-                        borderRight: "1px groove",
                         borderRadius: 0,
+                        border: "none",
+                        height: "100%",
                         display: "flex",
                         flexDirection: "column",
-                        height: "100%",
                     },
                     header: {
-                        background:
-                            isActualWeek && isToday
-                                ? "#1840EC"
-                                : isActualWeek
-                                  ? "#EAECF2"
-                                  : "transparent",
-                        color:
-                            isActualWeek && isToday
-                                ? "#FFF"
-                                : isActualMonth
-                                  ? "#061a5a"
-                                  : "#C3C9D7",
-                        fontWeight: 300,
-                        fontSize: "12px",
-                        borderRadius: 0,
+                        background: "transparent",
                         border: "none",
+                        padding: "4px 8px",
                         minHeight: "unset",
                     },
                     body: {
-                        borderRadius: 0,
-                        border: "none",
-                        padding: "8px",
+                        padding: "2px 6px 6px 6px",
                         flex: 1,
-                        minHeight: "100px",
                     },
                 }}
             >
-                <ul className="group">
+                <ul className="flex flex-col gap-1.5">
                     {listData?.map((item) => (
                         <ActivityModal key={item._id} item={item} />
                     ))}

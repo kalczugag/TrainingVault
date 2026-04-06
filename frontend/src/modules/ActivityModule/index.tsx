@@ -96,7 +96,6 @@ const ActivityModal = ({ item }: ActivityModalProps) => {
                         borderRadius: "4px",
                     }}
                     column={3}
-                    styles={{ content: { textWrap: "nowrap" } }}
                     title={item.title + " - " + item._id}
                 >
                     <Descriptions.Item label="Duration">

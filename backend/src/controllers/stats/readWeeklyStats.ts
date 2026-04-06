@@ -3,29 +3,45 @@ import { successResponse, errorResponse } from "../../handlers/apiResponse";
 import { WeeklyStatModel } from "../../models/WeeklyStat";
 import type { User } from "../../types/User";
 
+interface WeeklyStatsQueryParams {
+    page?: string;
+    limit?: string;
+    startDate?: string;
+    endDate?: string;
+}
+
 export const readWeeklyStats = async (
-    req: express.Request<{}, {}, {}, { page: string; limit: string }>,
+    req: express.Request<{}, {}, {}, WeeklyStatsQueryParams>,
     res: express.Response,
 ) => {
     try {
         const userId = (req.user as User)._id;
+        const { startDate, endDate, page, limit } = req.query;
 
-        const page = parseInt(req.query.page as string) || 1;
-        const limit = parseInt(req.query.limit as string) || 10;
+        const query: any = { athleteId: userId };
 
-        const skip = (page - 1) * limit;
+        if (startDate && endDate) {
+            query.weekStartDate = {
+                $gte: new Date(startDate as string),
+                $lte: new Date(endDate as string),
+            };
+        }
+
+        const currentPage = parseInt(page as string) || 1;
+        const currentLimit = parseInt(limit as string) || 10;
+        const skip = (currentPage - 1) * currentLimit;
 
         const [weeklyStats, totalCount] = await Promise.all([
-            WeeklyStatModel.find({ athleteId: userId })
+            WeeklyStatModel.find(query)
                 .sort({ weekStartDate: 1 })
                 .skip(skip)
-                .limit(limit)
+                .limit(currentLimit)
                 .lean(),
-            WeeklyStatModel.countDocuments({ athleteId: userId }),
+            WeeklyStatModel.countDocuments(query),
         ]);
 
         const hasMore = skip + weeklyStats.length < totalCount;
-        const nextCursor = hasMore ? page + 1 : undefined;
+        const nextCursor = hasMore ? currentPage + 1 : undefined;
 
         return res
             .status(200)

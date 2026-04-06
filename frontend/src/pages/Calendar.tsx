@@ -1,22 +1,56 @@
 import Loading from "@/components/Loading";
 import CalendarModule from "@/modules/CalendarModule";
 import { useGetActivitiesQuery, useGetWeeklyStatsQuery } from "@/store";
+import dayjs from "dayjs";
+import { useState } from "react";
 
 const Calendar = () => {
-    const { data: activities, isLoading: isLoadingActivities } =
-        useGetActivitiesQuery({});
-    const { data: weeklyStats, isLoading: isLoadingWeeklyStats } =
-        useGetWeeklyStatsQuery({ limit: 5 });
+    const [currentMonth, setCurrentMonth] = useState(dayjs());
+    const [page, setPage] = useState(1);
 
-    const anythingLoading = isLoadingActivities || isLoadingWeeklyStats;
+    const startDate = currentMonth
+        .startOf("month")
+        .startOf("isoWeek")
+        .toISOString();
+    const endDate = currentMonth.endOf("month").endOf("isoWeek").toISOString();
 
-    if (anythingLoading) return <Loading isLoading />;
+    const {
+        data: activitiesData,
+        isLoading: isLoadingActivities,
+        isFetching: isFetchingActivities,
+    } = useGetActivitiesQuery({ page, limit: 50, startDate, endDate });
+
+    const {
+        data: weeklyStatsData,
+        isLoading: isLoadingWeeklyStats,
+        isFetching: isFetchingWeeklyStats,
+    } = useGetWeeklyStatsQuery({ page, limit: 10, startDate, endDate });
+
+    const activities = activitiesData?.result || [];
+    const weeklyStats = weeklyStatsData?.result || [];
+
+    const isInitialLoading = isLoadingActivities || isLoadingWeeklyStats;
+    const isFetchingMore = isFetchingActivities || isFetchingWeeklyStats;
+
+    const handleLoadMoreWeeks = () => {
+        if (!isFetchingMore && activitiesData?.hasMore) {
+            setPage((prevPage) => prevPage + 1);
+        }
+    };
+
+    if (isInitialLoading && page === 1) return <Loading isLoading />;
 
     return (
         <CalendarModule
-            activities={activities!.result}
-            weeklyStats={weeklyStats!.result}
-            isLoading={anythingLoading}
+            activities={activities}
+            weeklyStats={weeklyStats}
+            isLoading={isFetchingMore}
+            loadMoreWeeks={handleLoadMoreWeeks}
+            currentMonth={currentMonth}
+            setCurrentMonth={(date) => {
+                setCurrentMonth(date);
+                setPage(1);
+            }}
         />
     );
 };

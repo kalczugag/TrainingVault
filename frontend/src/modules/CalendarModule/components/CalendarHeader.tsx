@@ -26,8 +26,8 @@ const CalendarHeader = ({
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 
     return (
-        <div className="fixed bg-white top-10 left-0 right-0 z-50 shadow">
-            <div className="h-16 flex items-center p-6">
+        <div className="bg-white left-0 right-0 z-50 shadow">
+            <div className="flex items-center px-6 py-0 pb-4">
                 <Space size="middle">
                     <Tooltip title="Select Date" placement="bottom">
                         <div
@@ -57,6 +57,7 @@ const CalendarHeader = ({
                                 />
                             </Space>
                             <DatePicker
+                                value={value}
                                 open={isDatePickerOpen}
                                 onOpenChange={(open) =>
                                     setIsDatePickerOpen(open)
@@ -110,7 +111,7 @@ const CalendarHeader = ({
                     </Tooltip>
                 </Space>
             </div>
-            <div className="flex w-full border-y border-gray-200 min-w-225">
+            <div className="flex w-full">
                 {[...getDaysOfWeek(), "Summary"].map((day) => (
                     <div
                         key={day}
